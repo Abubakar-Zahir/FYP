@@ -14,11 +14,11 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 |---|---|---|---|---|
 | P0-01 | Create monorepo, CI, lint, types, test setup | Backend | todo | |
 | P0-02 | docker-compose with Postgres (pgvector) and Redis | Backend | todo | |
-| P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
-| P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
-| P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
-| P0-06 | Prototype: script studio and hook scores | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
-| P0-07 | Prototype: editor preview and variants and comments insights | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
+| P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
+| P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
+| P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
+| P0-06 | Prototype: script studio and hook scores | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
+| P0-07 | Prototype: editor preview and variants and comments insights | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-08 | Spike: Instagram OAuth and reel import | Backend | todo | |
 | P0-09 | Spike: publish one Trial Reel via API | Backend | todo | Confirm account type needed |
 | P0-10 | Spike: DNA pipeline on 20 reels | ML video | todo | |
