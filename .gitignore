@@ -1,0 +1,27 @@
+# Secrets (rules.md 6.1)
+.env
+.env.*
+!.env.example
+
+# User data: videos, comments, datasets (rules.md 7.7)
+*.mp4
+*.mov
+*.webm
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
