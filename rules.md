@@ -59,7 +59,7 @@ These rules are binding for everyone, including AI assistants. If a rule blocks 
 7. Components are small, typed and have one job. Props are explicit. No prop drilling over 2 levels, use composition.
 8. Every data screen has a loading state, an empty state and an error state. No exceptions.
 9. Accessibility: semantic HTML, labels on inputs, keyboard navigation, visible focus, contrast AA. Mobile first, test at 375 px width.
-10. No inline styles. Use Tailwind classes and design tokens defined in `tailwind.config`.
+10. No inline styles, except for data-driven values such as bar widths. Use Tailwind classes and design tokens defined in `src/app/globals.css` (`@theme`).
 11. No secrets in client code. Only `NEXT_PUBLIC_` variables are exposed, and only if safe to expose.
 
 ## 5. Testing

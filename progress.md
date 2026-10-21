@@ -14,11 +14,11 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 |---|---|---|---|---|
 | P0-01 | Create monorepo, CI, lint, types, test setup | Backend | todo | |
 | P0-02 | docker-compose with Postgres (pgvector) and Redis | Backend | todo | |
-| P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | todo | |
-| P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | todo | |
-| P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | todo | |
-| P0-06 | Prototype: script studio and hook scores | Frontend | todo | |
-| P0-07 | Prototype: editor preview and variants and comments insights | Frontend | todo | |
+| P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
+| P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
+| P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
+| P0-06 | Prototype: script studio and hook scores | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
+| P0-07 | Prototype: editor preview and variants and comments insights | Frontend | doing | Built in `feat/web-prototype`, awaiting review |
 | P0-08 | Spike: Instagram OAuth and reel import | Backend | todo | |
 | P0-09 | Spike: publish one Trial Reel via API | Backend | todo | Confirm account type needed |
 | P0-10 | Spike: DNA pipeline on 20 reels | ML video | todo | |
@@ -52,6 +52,8 @@ Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 | 2026-10-21 | Reference reels are uploaded files only, no links | Avoids scraping and ToS problems |
 | 2026-10-21 | Brand module moved to v2 | Scope too large for the timeline |
 | 2026-10-21 | Frontend prototype first, with mock data | Gets feedback early and fixes the API contract before backend work |
+| 2026-10-21 | Glassmorphism visual style, dark base, one violet accent | Team choice for the prototype |
+| 2026-10-21 | Tailwind v4: tokens in `globals.css` `@theme`, not `tailwind.config` | v4 is CSS-first; no config file |
 
 ## Blockers
 
@@ -72,3 +74,4 @@ Add one line per working session: date, who, what was done, what is next.
 | Date | Who | Done | Next |
 |---|---|---|---|
 | 2026-10-21 | Team | Requirements doc reviewed, stack decided, docs set created | Start Phase 0 |
+| 2026-10-21 | Frontend | Prototype: 8 screens on MSW mocks, glass UI, works at 375 px and 1280 px | Review, add Vitest + Playwright, get creator feedback |

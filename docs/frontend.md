@@ -84,7 +84,7 @@ Out of the prototype: brand module, scheduling, B-roll picker, settings pages be
 
 ## UI rules
 
-1. Design tokens (colors, spacing, radius, type scale) live in `tailwind.config`. No hard-coded hex values in components.
+1. Design tokens (colors, spacing, radius, type scale) live in the `@theme` block of `src/app/globals.css` (Tailwind v4 has no `tailwind.config`). No hard-coded hex values in components.
 2. One accent color, neutral base, clear hierarchy. Keep it plain and fast to scan. Dashboards are for decisions, not decoration.
 3. Scores always show the top 3 contributing factors next to the number (explainability requirement).
 4. Show job status clearly: queued, running, done, failed. A failed job never blocks the page.
