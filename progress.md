@@ -75,3 +75,4 @@ Add one line per working session: date, who, what was done, what is next.
 |---|---|---|---|
 | 2026-10-21 | Team | Requirements doc reviewed, stack decided, docs set created | Start Phase 0 |
 | 2026-10-21 | Frontend | Prototype: 8 screens on MSW mocks, glass UI, works at 375 px and 1280 px | Review, add Vitest + Playwright, get creator feedback |
+| 2026-10-21 | Frontend | Landing page at `/` for pilot recruitment (editorial glass style, no fake stats or testimonials) | Feedback from creators, link pilot form |

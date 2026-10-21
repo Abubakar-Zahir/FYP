@@ -7,11 +7,6 @@ const nextConfig: NextConfig = {
   // Without it Next blocks its dev scripts there and no button works.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   partialPrefetching: true,
-  // A config redirect instead of a page that only calls redirect(): such a page never
-  // renders, which trips instant-navigation validation in dev.
-  async redirects() {
-    return [{ source: "/", destination: "/login", permanent: false }];
-  },
   turbopack: {
     rules: {
       "*.css": {
