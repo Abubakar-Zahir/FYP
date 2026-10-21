@@ -78,7 +78,8 @@ export function LoginPanel() {
           <span className="h-px flex-1 bg-edge" />
         </div>
 
-        <form noValidate onSubmit={form.handleSubmit(continueToApp)} className="space-y-4">
+        {/* method="post" keeps the password out of the URL if the form ever submits without JavaScript */}
+        <form method="post" noValidate onSubmit={form.handleSubmit(continueToApp)} className="space-y-4">
           <Field label="Email" htmlFor="email" error={form.formState.errors.email?.message}>
             <Input
               id="email"
