@@ -1,9 +1,15 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useId, useSyncExternalStore } from "react";
 
-import { MOCK_SCENARIOS, readMockScenario, writeMockScenario, type MockScenario } from "@/lib/mocks/scenario";
+import {
+  MOCK_SCENARIOS,
+  readMockScenario,
+  subscribeMockScenario,
+  writeMockScenario,
+  type MockScenario,
+} from "@/lib/mocks/scenario";
 import { cn } from "@/lib/utils";
 
 const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
@@ -11,7 +17,8 @@ const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
 /** Prototype-only control for reviewing each screen's loading, empty and error states. */
 export function MockScenarioSwitcher() {
   const queryClient = useQueryClient();
-  const [scenario, setScenario] = useState<MockScenario>(readMockScenario);
+  // The server renders "normal"; the browser then reads the saved choice without a hydration mismatch.
+  const scenario = useSyncExternalStore(subscribeMockScenario, readMockScenario, () => "normal" as const);
   // The switcher renders in both the sidebar and the mobile drawer, so each radio group needs its own name.
   const groupName = useId();
 
@@ -19,7 +26,6 @@ export function MockScenarioSwitcher() {
 
   function choose(next: MockScenario) {
     writeMockScenario(next);
-    setScenario(next);
     void queryClient.resetQueries();
   }
 

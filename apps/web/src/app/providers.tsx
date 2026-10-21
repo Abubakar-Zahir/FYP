@@ -1,12 +1,23 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
-import { LoadingScreen } from "@/components/ui/states";
+import { holdRequestsUntil } from "@/lib/api/client";
 
 const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
 const STALE_TIME_MS = 30_000;
+
+/*
+ * Pages render right away (Next validates every segment for instant navigation),
+ * and only the API requests wait for the MSW worker. Started at module load, once,
+ * because Strict Mode runs effects twice and a second worker.start() throws.
+ */
+if (USE_MOCKS && typeof window !== "undefined") {
+  holdRequestsUntil(
+    import("@/lib/mocks/browser").then(({ worker }) => worker.start({ onUnhandledRequest: "bypass", quiet: true })),
+  );
+}
 
 function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -16,34 +27,7 @@ function createQueryClient(): QueryClient {
   });
 }
 
-/**
- * Starts the MSW worker before any query runs, so the first requests are
- * mocked instead of hitting a backend that does not exist yet.
- */
-function useMockWorker(): boolean {
-  const [ready, setReady] = useState(!USE_MOCKS);
-
-  useEffect(() => {
-    if (!USE_MOCKS) return;
-    let cancelled = false;
-    import("@/lib/mocks/browser")
-      .then(({ worker }) => worker.start({ onUnhandledRequest: "bypass", quiet: true }))
-      .then(() => {
-        if (!cancelled) setReady(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return ready;
-}
-
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
-  const mocksReady = useMockWorker();
-
-  return (
-    <QueryClientProvider client={queryClient}>{mocksReady ? children : <LoadingScreen />}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

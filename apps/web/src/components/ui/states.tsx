@@ -1,7 +1,7 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import { CircleAlert, Inbox, LoaderCircle, RefreshCw, type LucideIcon } from "lucide-react";
+import { CircleAlert, Inbox, RefreshCw, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -27,15 +27,6 @@ export function LoadingBlock({ label, className }: { label: string; className?: 
       <Skeleton className="h-5 w-1/3" />
       <Skeleton className="h-24 w-full" />
       <Skeleton className="h-4 w-2/3" />
-    </div>
-  );
-}
-
-export function LoadingScreen() {
-  return (
-    <div role="status" className="grid min-h-dvh place-items-center">
-      <LoaderCircle aria-hidden className="size-8 animate-spin text-accent" />
-      <span className="sr-only">Loading</span>
     </div>
   );
 }

@@ -2,6 +2,13 @@ import type { ApiError } from "./types";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/v1`;
 
+let requestsReady: Promise<unknown> = Promise.resolve();
+
+/** Lets the prototype hold every request until the MSW worker is intercepting. */
+export function holdRequestsUntil(ready: Promise<unknown>): void {
+  requestsReady = ready;
+}
+
 export class ApiRequestError extends Error {
   readonly status: number;
   readonly code: string;
@@ -27,6 +34,7 @@ async function readError(response: Response): Promise<ApiRequestError> {
 }
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  await requestsReady;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
