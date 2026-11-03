@@ -22,3 +22,24 @@ Set `SUPABASE_URL` (for example `https://your-project.supabase.co`) in `.env`, a
 | 401 | `invalid_token` | Token expired, forged, anonymous, or for another project |
 | 503 | `auth_unavailable` | Supabase's keys could not be fetched |
 | 503 | `auth_not_configured` | `SUPABASE_URL` is not set |
+
+## Database
+
+Set `DATABASE_URL` in `.env`, for example `postgresql+asyncpg://fyp:<password>@localhost:5432/fyp`. Then:
+
+```
+uv run alembic -c apps/api/alembic.ini upgrade head
+uv run alembic -c apps/api/alembic.ini revision --autogenerate -m "describe the change"
+```
+
+Change tables only through new migrations, and never edit a merged one (`rules.md` 3.8). Tests run the real migration on a temporary SQLite file.
+
+## Me endpoints
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/v1/me` | Identity from the token, plus the saved profile, or `null` before onboarding |
+| `PUT /api/v1/me/profile` | Creates or updates the onboarding profile |
+| `DELETE /api/v1/me` | Deletes this user's rows. Safe to repeat |
+
+The user always comes from the verified token, so no endpoint can reach another user's data. Email and name are read from the token and never stored here.

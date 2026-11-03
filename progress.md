@@ -31,7 +31,7 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 | ID | Task | Owner | Status |
 |---|---|---|---|
 | P1-01 | Auth with Supabase, backend JWT verification | Backend | doing |
-| P1-02 | Onboarding API and real screens | Frontend | todo |
+| P1-02 | Onboarding API and real screens | Frontend | doing |
 | P1-03 | Instagram connect and reel import jobs | Backend | todo |
 | P1-04 | DNA extractor v1 in `ml/` and worker | ML video | todo |
 | P1-05 | DNA screens wired to real API | Frontend | todo |

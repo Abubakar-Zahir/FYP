@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     app_name: str = "AI Content Intelligence Platform"
     api_version: str = "0.1.0"
     supabase_url: str | None = None
+    database_url: str | None = None
     cors_origins: list[str] = ["http://localhost:3000"]
 
     @property
