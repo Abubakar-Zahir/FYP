@@ -23,7 +23,7 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 | P0-09 | Spike: publish one Trial Reel via API | Backend | todo | Confirm account type needed |
 | P0-10 | Spike: DNA pipeline on 20 reels | ML video | todo | |
 | P0-11 | Spike: Whisper WER on Urdu and Roman Urdu | ML video | todo | |
-| P0-12 | Label guideline (6 classes) and Label Studio setup | ML NLP | todo | |
+| P0-12 | Label guideline (6 classes) and Label Studio setup | ML NLP | done | Awaiting review. NLP owner to approve the guideline |
 | P0-13 | Gate 0 review | All | todo | |
 
 ## Phase 1 (weeks 3 to 6)

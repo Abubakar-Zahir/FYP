@@ -1,0 +1,24 @@
+<View>
+  <Header value="Comment"/>
+  <Text name="comment" value="$text" granularity="symbol"/>
+  <Header value="Label (docs/label-guideline.md)"/>
+  <Choices name="label" toName="comment" choice="single-radio" required="true" showInline="true">
+    <Choice value="question" hotkey="1"/>
+    <Choice value="request" hotkey="2"/>
+    <Choice value="praise" hotkey="3"/>
+    <Choice value="objection" hotkey="4"/>
+    <Choice value="complaint" hotkey="5"/>
+    <Choice value="spam" hotkey="6"/>
+  </Choices>
+  <Header value="Language"/>
+  <Choices name="language" toName="comment" choice="single-radio" required="true" showInline="true">
+    <Choice value="english" hotkey="q"/>
+    <Choice value="urdu" hotkey="w"/>
+    <Choice value="roman_urdu" hotkey="e"/>
+    <Choice value="mixed" hotkey="r"/>
+    <Choice value="none" hotkey="t"/>
+  </Choices>
+  <Choices name="confidence" toName="comment" choice="multiple" showInline="true">
+    <Choice value="unsure" hotkey="u"/>
+  </Choices>
+</View>

@@ -1,0 +1,11 @@
+# Bound to localhost because comments are user data. See README.md before exposing it.
+services:
+  label-studio:
+    image: heartexlabs/label-studio:1.23.2
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - label_studio_data:/label-studio/data
+
+volumes:
+  label_studio_data:
