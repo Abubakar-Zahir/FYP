@@ -21,6 +21,8 @@ pnpm install && pnpm dev                     # web, http://localhost:3000
 uv sync && uv run fastapi dev apps/api/app/main.py   # api, http://localhost:8000
 ```
 
+For Postgres and Redis, see `infra/README.md`.
+
 ## Checks (the same ones CI runs)
 
 ```
