@@ -20,6 +20,8 @@ __pycache__/
 # Node
 node_modules/
 .next/
+test-results/
+playwright-report/
 
 # OS / editor
 .DS_Store

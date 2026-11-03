@@ -24,6 +24,7 @@ uv sync && uv run fastapi dev apps/api/app/main.py   # api, http://localhost:800
 ## Checks (the same ones CI runs)
 
 ```
-pnpm lint && pnpm typecheck && pnpm build
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm test:e2e
 uv run ruff check . && uv run ruff format --check . && uv run mypy apps/api ml && uv run pytest
 ```
