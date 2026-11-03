@@ -35,3 +35,17 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
+
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start the stack
+        run: |
+          echo "POSTGRES_PASSWORD=ci-only" > infra/.env
+          docker compose -f infra/docker-compose.yml up -d --wait
+      - name: Check pgvector and Redis respond
+        run: |
+          docker compose -f infra/docker-compose.yml exec -T postgres \
+            sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT extname FROM pg_extension"' | grep -x vector
+          docker compose -f infra/docker-compose.yml exec -T redis redis-cli ping | grep -x PONG
