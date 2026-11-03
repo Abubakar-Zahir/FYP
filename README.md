@@ -26,6 +26,7 @@ For Postgres and Redis, see `infra/README.md`.
 ## Checks (the same ones CI runs)
 
 ```
-pnpm lint && pnpm typecheck && pnpm build
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm test:e2e
 uv run ruff check . && uv run ruff format --check . && uv run mypy apps/api ml && uv run pytest
 ```

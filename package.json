@@ -6,6 +6,8 @@
     "dev": "pnpm --filter @fyp/web dev",
     "build": "pnpm --filter @fyp/web build",
     "lint": "pnpm --filter @fyp/web lint",
-    "typecheck": "pnpm --filter @fyp/web typecheck"
+    "typecheck": "pnpm --filter @fyp/web typecheck",
+    "test": "pnpm --filter @fyp/web test",
+    "test:e2e": "pnpm --filter @fyp/web test:e2e"
   }
 }
