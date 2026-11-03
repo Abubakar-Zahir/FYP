@@ -10,6 +10,7 @@ from app.api.v1.me import router as me_router
 from app.core.errors import register_error_handlers
 from app.core.security import TokenVerifier
 from app.core.settings import Settings, get_settings
+from app.db.session import create_engine, create_session_factory
 
 API_PREFIX = "/api/v1"
 
@@ -17,10 +18,14 @@ API_PREFIX = "/api/v1"
 def create_app(settings: Settings) -> FastAPI:
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+        engine = create_engine(settings.database_url) if settings.database_url else None
+        application.state.session_factory = create_session_factory(engine) if engine else None
         async with httpx.AsyncClient() as http:
             issuer = settings.supabase_issuer
             application.state.token_verifier = TokenVerifier(issuer, http) if issuer else None
             yield
+        if engine:
+            await engine.dispose()
 
     application = FastAPI(title=settings.app_name, version=settings.api_version, lifespan=lifespan)
     application.add_middleware(

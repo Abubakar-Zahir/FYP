@@ -57,7 +57,15 @@ async def _handle_http_exception(_: Request, error: Exception) -> JSONResponse:
     return _error_response(error.status_code, code, str(error.detail), headers=headers)
 
 
+async def _handle_unexpected_error(_: Request, __: Exception) -> JSONResponse:
+    # Details stay in the server log, because they can name hosts, paths and queries.
+    return _error_response(
+        status.HTTP_500_INTERNAL_SERVER_ERROR, "internal_error", "Something went wrong on our side."
+    )
+
+
 def register_error_handlers(application: FastAPI) -> None:
+    application.add_exception_handler(Exception, _handle_unexpected_error)
     application.add_exception_handler(ApiError, _handle_api_error)
     application.add_exception_handler(RequestValidationError, _handle_validation_error)
     application.add_exception_handler(HTTPException, _handle_http_exception)
