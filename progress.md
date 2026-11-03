@@ -30,7 +30,7 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 
 | ID | Task | Owner | Status |
 |---|---|---|---|
-| P1-01 | Auth with Supabase, backend JWT verification | Backend | todo |
+| P1-01 | Auth with Supabase, backend JWT verification | Backend | doing |
 | P1-02 | Onboarding API and real screens | Frontend | todo |
 | P1-03 | Instagram connect and reel import jobs | Backend | todo |
 | P1-04 | DNA extractor v1 in `ml/` and worker | ML video | todo |
@@ -52,6 +52,7 @@ Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 | 2026-10-21 | Reference reels are uploaded files only, no links | Avoids scraping and ToS problems |
 | 2026-10-21 | Brand module moved to v2 | Scope too large for the timeline |
 | 2026-10-21 | Frontend prototype first, with mock data | Gets feedback early and fixes the API contract before backend work |
+| 2026-11-03 | Verify Supabase tokens with public keys (JWKS), not the shared secret | Supabase strongly recommends against local verification with the secret. Needs asymmetric signing keys on the project |
 | 2026-10-21 | Glassmorphism visual style, dark base, one violet accent | Team choice for the prototype |
 | 2026-10-21 | Tailwind v4: tokens in `globals.css` `@theme`, not `tailwind.config` | v4 is CSS-first; no config file |
 
