@@ -1,0 +1,43 @@
+[project]
+name = "fyp"
+version = "0.1.0"
+description = "AI Content Intelligence Platform: API, workers and ML package"
+requires-python = "==3.12.*"
+dependencies = [
+    "fastapi[standard]>=0.115",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "T20"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101"]
+"spikes/**" = ["T20", "S603", "S607"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "apps/api:."
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+pythonpath = ["apps/api", "."]
+testpaths = ["apps/api/tests", "ml/tests", "spikes"]
+addopts = "--import-mode=importlib"
