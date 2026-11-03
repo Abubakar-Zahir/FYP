@@ -12,7 +12,7 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 
 | ID | Task | Owner | Status | Notes |
 |---|---|---|---|---|
-| P0-01 | Create monorepo, CI, lint, types, test setup | Backend | todo | |
+| P0-01 | Create monorepo, CI, lint, types, test setup | Backend | done | Awaiting review. CI first runs when pushed |
 | P0-02 | docker-compose with Postgres (pgvector) and Redis | Backend | todo | |
 | P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |

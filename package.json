@@ -1,0 +1,11 @@
+{
+  "name": "fyp",
+  "private": true,
+  "packageManager": "pnpm@12.11.2",
+  "scripts": {
+    "dev": "pnpm --filter @fyp/web dev",
+    "build": "pnpm --filter @fyp/web build",
+    "lint": "pnpm --filter @fyp/web lint",
+    "typecheck": "pnpm --filter @fyp/web typecheck"
+  }
+}
