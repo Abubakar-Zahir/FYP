@@ -69,3 +69,26 @@ Every LLM call goes through `app/services/llm.py`. `LlmClient.complete` checks t
 `LLM_PROVIDER=openai_compatible` covers OpenRouter (`LLM_BASE_URL=https://openrouter.ai/api/v1`) and Gemini's OpenAI-compatible endpoint. Copy the per-million-token prices from the provider's price page into `LLM_INPUT_USD_PER_MILLION_TOKENS` and `LLM_OUTPUT_USD_PER_MILLION_TOKENS`. Without them the client refuses to start, because the budget guard can't work.
 
 Errors: `LlmUnavailable` (timeouts, 429, 5xx) is worth retrying. `LlmRequestRejected` and `LlmBadResponse` are not. `LlmBudgetExceeded` stops all calls until the next month.
+
+## Instagram
+
+Uses the Instagram API with Instagram Login (`app/services/instagram.py`, ported from `spikes/instagram/`).
+
+1. `GET /api/v1/instagram/connect` returns `authorize_url`. The web app sends the browser there.
+2. Instagram redirects to `INSTAGRAM_REDIRECT_URI`, the web app's `/connect/instagram` page, with `code` and `state`.
+3. That page calls `POST /api/v1/instagram/callback`. The API checks that `state` was signed for the same user within 10 minutes, swaps the code for a long-lived token, stores it encrypted, and starts the reel import job (`202`).
+
+| Endpoint | What it does |
+|---|---|
+| `GET /instagram/connect` | Authorize URL with a signed, expiring state |
+| `POST /instagram/callback` | Connects the account and starts the import job |
+| `POST /instagram/import` | Starts another import job. 404 `instagram_not_connected` without an account |
+| `DELETE /instagram/account` | Disconnects and deletes the stored token. Safe to repeat |
+
+Tokens are encrypted with Fernet before they reach the database (`app/core/crypto.py`, rules.md 6.2). Set `TOKEN_ENCRYPTION_KEY` to a key from:
+
+```
+uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Changing the key makes stored tokens unreadable, and every creator has to reconnect. `DELETE /me` also removes the Instagram account and the user's jobs.

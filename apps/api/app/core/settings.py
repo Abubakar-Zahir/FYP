@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     redis_url: str | None = None
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    token_encryption_key: SecretStr | None = None
+    instagram_app_id: str | None = None
+    instagram_app_secret: SecretStr | None = None
+    # The web app's /connect/instagram page, registered on the Meta app.
+    instagram_redirect_uri: str | None = None
+
     llm_provider: LlmProviderName | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None

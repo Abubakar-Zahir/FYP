@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.health import router as health_router
+from app.api.v1.instagram import router as instagram_router
 from app.api.v1.jobs import router as jobs_router
 from app.api.v1.me import router as me_router
 from app.core.errors import register_error_handlers
@@ -33,6 +34,7 @@ def create_app(settings: Settings) -> FastAPI:
         application.state.session_factory = create_session_factory(engine) if engine else None
         application.state.job_queue = _job_queue(settings)
         async with httpx.AsyncClient() as http:
+            application.state.http = http
             issuer = settings.supabase_issuer
             application.state.token_verifier = TokenVerifier(issuer, http) if issuer else None
             yield
@@ -50,6 +52,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(health_router, prefix=API_PREFIX)
     application.include_router(me_router, prefix=API_PREFIX)
     application.include_router(jobs_router, prefix=API_PREFIX)
+    application.include_router(instagram_router, prefix=API_PREFIX)
     return application
 
 
