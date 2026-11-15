@@ -1,0 +1,19 @@
+# Keep the API build context small and free of secrets and user data.
+.git
+.github
+.claude
+.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+node_modules
+apps/web
+notebooks
+spikes
+data
+docs
+.env
+.env.*
+**/.env
+**/.env.*

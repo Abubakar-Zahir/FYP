@@ -63,3 +63,9 @@ jobs:
           docker compose -f infra/docker-compose.yml exec -T postgres \
             sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT extname FROM pg_extension"' | grep -x vector
           docker compose -f infra/docker-compose.yml exec -T redis redis-cli ping | grep -x PONG
+      - name: Build the production API image
+        run: docker build -f apps/api/Dockerfile -t fyp-api .
+      - name: Check the production compose file is valid
+        run: |
+          echo "API_DOMAIN=ci.example.com" > infra/.env.prod
+          docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod config --quiet

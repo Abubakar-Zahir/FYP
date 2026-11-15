@@ -17,3 +17,9 @@ REDIS_URL=redis://localhost:6379/0
 ```
 
 `docker compose -f infra/docker-compose.yml down` stops the stack and keeps the data. Adding `-v` deletes the data.
+
+If 5432 or 6379 are already used on your machine, set `POSTGRES_PORT` and `REDIS_PORT` in `infra/.env`, and use the same ports in `DATABASE_URL` and `REDIS_URL`.
+
+## Production
+
+`docker-compose.prod.yml` and `Caddyfile` run the API on a VPS with HTTPS. Steps are in `docs/deploy.md`.
