@@ -9,6 +9,7 @@ from app.models.instagram_account import InstagramAccount
 from app.models.job import Job
 from app.models.llm_call import LlmCall
 from app.models.reel import Comment, Reel
+from app.models.script import Script
 from app.models.user import User
 from app.schemas.me import Profile
 from app.services import reels
@@ -16,9 +17,10 @@ from app.services.storage import Storage, storage_not_configured
 
 # Every table with a user_id, children before parents. A new user-owned table must be added here.
 USER_OWNED_MODELS: tuple[
-    type[Comment] | type[DnaRecordRow] | type[Reel] | type[InstagramAccount] | type[Job], ...
+    type[Comment] | type[Script] | type[DnaRecordRow] | type[Reel] | type[InstagramAccount] | type[Job], ...
 ] = (
     Comment,
+    Script,
     DnaRecordRow,
     Reel,
     InstagramAccount,

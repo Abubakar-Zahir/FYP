@@ -139,3 +139,11 @@ The job result is `{"dna_id": ...}`. Error codes: `video_too_long`, `video_unrea
 | `POST /dna/{id}/save-template` | Marks it as a template for script generation |
 
 Keyframes are not kept yet, because nothing reads them until OCR or a vision model is wired. `WHISPER_MODEL` (default `small`) and `DNA_CUT_THRESHOLD` (default 27) tune the extractor.
+
+## Script generation
+
+`POST /api/v1/scripts/generate {template_id, topic, language}` checks that the DNA template is the caller's and that onboarding is done (409 `profile_missing`), creates the script row, and starts `scripts.generate` on the `ai` queue. `language` is `english`, `roman_urdu` or `mixed`.
+
+The worker builds the prompt from the template's structure, the creator's niche, tone and goals, and their latest captions as voice examples (`ml/scripts/generate.py`). It asks for 5 hooks, 3 angles and a full script, retries once on a bad answer, and stores the prompt and model version with the output.
+
+`GET /api/v1/scripts/{id}` returns the script, or `409 script_not_ready` while the job runs. Hooks carry `score: null` until the hook scorer ships in Phase 2.

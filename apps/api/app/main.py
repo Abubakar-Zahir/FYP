@@ -11,6 +11,7 @@ from app.api.v1.instagram import router as instagram_router
 from app.api.v1.jobs import router as jobs_router
 from app.api.v1.me import router as me_router
 from app.api.v1.reels import router as reels_router
+from app.api.v1.scripts import router as scripts_router
 from app.core.errors import register_error_handlers
 from app.core.security import TokenVerifier
 from app.core.settings import Settings, get_settings
@@ -59,6 +60,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(instagram_router, prefix=API_PREFIX)
     application.include_router(reels_router, prefix=API_PREFIX)
     application.include_router(dna_router, prefix=API_PREFIX)
+    application.include_router(scripts_router, prefix=API_PREFIX)
     return application
 
 
