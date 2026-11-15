@@ -19,7 +19,7 @@ def imported_top_level_modules(source: str) -> Iterator[str]:
 @pytest.mark.parametrize("path", list(ML_ROOT.rglob("*.py")), ids=str)
 def test_ml_stays_framework_free(path: Path) -> None:
     """rules.md 3.9: workers call into ml/, never the other way round."""
-    assert not FORBIDDEN & set(imported_top_level_modules(path.read_text()))
+    assert not FORBIDDEN & set(imported_top_level_modules(path.read_text(encoding="utf-8")))
 
 
 def test_detects_forbidden_import() -> None:
