@@ -13,7 +13,7 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 | ID | Task | Owner | Status | Notes |
 |---|---|---|---|---|
 | P0-01 | Create monorepo, CI, lint, types, test setup | Backend | done | Awaiting review. CI first runs when pushed |
-| P0-02 | docker-compose with Postgres (pgvector) and Redis | Backend | doing | Not run yet: no Docker on the dev machine. The CI `infra` job tests it on first push |
+| P0-02 | docker-compose with Postgres (pgvector) and Redis | Backend | done | Run locally on 2026-11-16: pgvector 0.8.7 and Redis healthy, Alembic migrations applied. Awaiting review |
 | P0-03 | Frontend scaffold: Next.js, Tailwind, shadcn, tokens | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-04 | Prototype: login and onboarding screens (mock data) | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
@@ -54,6 +54,7 @@ Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 | 2026-10-21 | Frontend prototype first, with mock data | Gets feedback early and fixes the API contract before backend work |
 | 2026-11-03 | Verify Supabase tokens with public keys (JWKS), not the shared secret | Supabase strongly recommends against local verification with the secret. Needs asymmetric signing keys on the project |
 | 2026-10-21 | Glassmorphism visual style, dark base, one violet accent | Team choice for the prototype |
+| 2026-11-11 | Replaced by a light theme: white base, hot pink accent `#ff0087`, Inter headings and Geist body | Team choice, modelled on a reference landing page. Tokens still live in `globals.css` `@theme` |
 | 2026-10-21 | Tailwind v4: tokens in `globals.css` `@theme`, not `tailwind.config` | v4 is CSS-first; no config file |
 
 ## Blockers
@@ -77,3 +78,4 @@ Add one line per working session: date, who, what was done, what is next.
 | 2026-10-21 | Team | Requirements doc reviewed, stack decided, docs set created | Start Phase 0 |
 | 2026-10-21 | Frontend | Prototype: 8 screens on MSW mocks, glass UI, works at 375 px and 1280 px | Review, add Vitest + Playwright, get creator feedback |
 | 2026-10-21 | Frontend | Landing page at `/` for pilot recruitment (editorial glass style, no fake stats or testimonials) | Feedback from creators, link pilot form |
+| 2026-11-16 | Backend | Ran the full stack locally: web and API checks, 110 pytest, 10 Playwright, docker-compose and migrations all pass | Run Instagram spike on a real account, LLM structuring step, Gate 0 |
