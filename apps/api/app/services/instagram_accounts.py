@@ -13,7 +13,7 @@ from app.core.crypto import TokenCipher
 from app.core.errors import ApiError
 from app.core.settings import Settings, get_settings
 from app.models.instagram_account import InstagramAccount
-from app.services import instagram
+from app.services import instagram, reels
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +99,7 @@ async def connect(
 
 
 async def disconnect(session: AsyncSession, user_id: UUID) -> None:
-    """Idempotent. Imported reels and comments go in the same transaction once they exist."""
+    """Removes the token and everything imported from the account, in one transaction. Idempotent."""
+    await reels.delete_own_reels(session, user_id)
     await session.execute(delete(InstagramAccount).where(InstagramAccount.user_id == user_id))
     await session.commit()

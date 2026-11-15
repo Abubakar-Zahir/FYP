@@ -90,18 +90,28 @@ async def run_job(
         await jobs.mark_done(session, job, result)
 
 
-def execute(settings: Settings, job_id: str, handler: JobHandler, *, final_attempt: bool) -> None:
-    """Entry point for Celery tasks."""
+def run_with_sessions[Result](
+    settings: Settings, work: Callable[[async_sessionmaker[AsyncSession]], Awaitable[Result]]
+) -> Result:
+    """Runs async work from a synchronous Celery task, with an engine that lives for this run only."""
     if not settings.database_url:
-        raise RuntimeError("DATABASE_URL is required to run jobs.")
+        raise RuntimeError("DATABASE_URL is required to run background tasks.")
     database_url = settings.database_url
 
-    async def _run() -> None:
+    async def _run() -> Result:
         engine = create_async_engine(database_url, poolclass=NullPool, hide_parameters=True)
         try:
-            factory = async_sessionmaker(engine, expire_on_commit=False)
-            await run_job(factory, settings, UUID(job_id), handler, final_attempt=final_attempt)
+            return await work(async_sessionmaker(engine, expire_on_commit=False))
         finally:
             await engine.dispose()
 
-    asyncio.run(_run())
+    return asyncio.run(_run())
+
+
+def execute(settings: Settings, job_id: str, handler: JobHandler, *, final_attempt: bool) -> None:
+    """Entry point for Celery tasks that report through a jobs row."""
+
+    async def work(factory: async_sessionmaker[AsyncSession]) -> None:
+        await run_job(factory, settings, UUID(job_id), handler, final_attempt=final_attempt)
+
+    run_with_sessions(settings, work)

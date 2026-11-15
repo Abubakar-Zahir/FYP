@@ -48,8 +48,7 @@ ml/
 |---|---|
 | `users` | id (Supabase uid), role, niche, language_mix, tone, goals |
 | `ig_accounts` | user_id, ig_user_id, encrypted_token, scopes, token_expires_at, account_type |
-| `reels` | ig_account_id, ig_media_id, caption, posted_at, source (own or reference), r2_key |
-| `reel_metrics` | reel_id, views, reach, saves, shares, watch_time, fetched_at |
+| `reels` | user_id, ig_media_id, title, caption, posted_at, source (own or reference), r2_key, latest views, reach, saves, shares, avg_watch_time_s, outlier_score, metrics_fetched_at |
 | `dna_records` | reel_id, schema_version, hook_type, pacing, beats (json), overlays (json), cta, length_s, outlier_score, embedding (vector) |
 | `dna_templates` | user_id, dna_record_id, name |
 | `scripts` | user_id, template_id, topic, language, hooks (json), angles (json), body, model_version |
@@ -67,6 +66,8 @@ ml/
 | `jobs` | id, user_id, type, status, progress, result (json), error, created_at |
 
 Comments and tokens are user data. Deleting a user removes rows and R2 objects.
+
+`reels` keeps only the latest metrics. A null metric means Instagram had no value yet, not zero. Per-variant history at 24 h and 72 h lives in `variant_insights` (Phase 3), so a separate `reel_metrics` table was dropped.
 
 ## API surface (v1)
 

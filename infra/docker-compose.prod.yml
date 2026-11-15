@@ -6,7 +6,19 @@ services:
     build:
       context: ..
       dockerfile: apps/api/Dockerfile
-    command: ["celery", "--workdir", "apps/api", "-A", "app.workers.celery_app", "worker", "--queues", "default,ai", "--concurrency", "4", "-l", "info"]
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--queues", "default,ai", "--concurrency", "4", "-l", "info"]
+    env_file: .env.prod
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Scheduled tasks, such as the daily Instagram token refresh. Exactly one must run.
+  beat:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "app.workers.celery_app", "beat", "-l", "info", "--schedule", "/tmp/celerybeat-schedule"]
     env_file: .env.prod
     restart: unless-stopped
     depends_on:
@@ -20,7 +32,7 @@ services:
       dockerfile: apps/api/Dockerfile
       args:
         UV_GROUPS: "--group video"
-    command: ["celery", "--workdir", "apps/api", "-A", "app.workers.celery_app", "worker", "--queues", "video", "--concurrency", "1", "-l", "info"]
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--queues", "video", "--concurrency", "1", "-l", "info"]
     env_file: .env.prod
     restart: unless-stopped
     volumes:
