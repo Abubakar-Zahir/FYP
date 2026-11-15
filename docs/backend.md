@@ -49,8 +49,7 @@ ml/
 | `users` | id (Supabase uid), role, niche, language_mix, tone, goals |
 | `ig_accounts` | user_id, ig_user_id, encrypted_token, scopes, token_expires_at, account_type |
 | `reels` | user_id, ig_media_id, title, caption, posted_at, source (own or reference), r2_key, latest views, reach, saves, shares, avg_watch_time_s, outlier_score, metrics_fetched_at |
-| `dna_records` | reel_id, schema_version, hook_type, pacing, beats (json), overlays (json), cta, length_s, outlier_score, embedding (vector) |
-| `dna_templates` | user_id, dna_record_id, name |
+| `dna_records` | user_id, reel_id, schema_version, hook_type, hook_text, pacing, cta, length_s, transcript, record (full DnaRecord json), model_version, is_template. Embedding (vector) comes in Phase 2 |
 | `scripts` | user_id, template_id, topic, language, hooks (json), angles (json), body, model_version |
 | `hook_scores` | script_id, hook_text, score, top_factors (json), model_version |
 | `videos` | user_id, r2_key, duration_s, status |
@@ -76,10 +75,10 @@ All under `/api/v1`. Auth: `Authorization: Bearer <Supabase JWT>`.
 | Area | Endpoints |
 |---|---|
 | Me | `GET /me`, `PUT /me/profile`, `DELETE /me` (delete all data) |
-| Instagram | `GET /instagram/connect` (start OAuth), `GET /instagram/callback`, `DELETE /instagram/account`, `POST /instagram/import` (job) |
-| Reels | `GET /reels`, `GET /reels/{id}`, `POST /reels/reference` (upload reference file), `GET /reels/{id}/metrics` |
-| DNA | `POST /dna/analyse` (job), `GET /dna`, `GET /dna/{id}`, `POST /dna/{id}/save-template`, `GET /dna/clusters` |
-| Scripts | `POST /scripts/generate` (job), `GET /scripts/{id}`, `POST /hooks/score` |
+| Instagram | `GET /instagram/connect` (authorize URL), `POST /instagram/callback` (the web app's `/connect/instagram` page forwards `code` and `state`; starts the import job), `DELETE /instagram/account`, `POST /instagram/import` (job) |
+| Reels | `GET /reels`, `POST /reels/reference` (presigned upload URL for a reference file), `DELETE /reels/{id}`, `GET /reels/{id}/metrics` (Phase 3) |
+| DNA | `POST /dna/analyse {reel_id}` (job), `GET /dna`, `GET /dna/{id}`, `POST /dna/{id}/save-template`, `GET /dna/clusters` (Phase 2) |
+| Scripts | `POST /scripts/generate` (job), `GET /scripts/{id}`, `POST /hooks/score` (Phase 2) |
 | Editing | `POST /videos/upload-url`, `POST /videos/{id}/edit` (job), `GET /videos/{id}/edit/{job_id}` |
 | Variants | `POST /experiments` (create variants), `POST /experiments/{id}/publish` (job), `GET /experiments/{id}`, `POST /experiments/{id}/share-winner` |
 | Comments | `GET /comments/themes`, `GET /comments/summary`, `POST /comments/sync` (job) |
