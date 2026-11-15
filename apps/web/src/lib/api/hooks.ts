@@ -11,13 +11,18 @@ import type {
   EditOptions,
   Experiment,
   GenerateScriptRequest,
+  InstagramAuthorizeUrl,
+  InstagramCallback,
+  InstagramConnected,
   Job,
   JobAccepted,
   Me,
   Page,
   Profile,
   Reel,
+  ReferenceUpload,
   Script,
+  VideoContentType,
   WeeklyReport,
 } from "./types";
 
@@ -49,15 +54,62 @@ export function useUpdateProfile() {
   });
 }
 
-/**
- * The real endpoint starts an OAuth redirect (docs/backend.md). The prototype mock
- * answers with the connected account instead, so the flow can be clicked through.
- */
-export function useConnectInstagram() {
+/** Gets Instagram's sign-in URL. The caller sends the browser there. */
+export function useStartInstagramConnect() {
+  return useMutation({ mutationFn: () => apiGet<InstagramAuthorizeUrl>("/instagram/connect") });
+}
+
+/** Finishes the OAuth flow from the callback page. It also starts the reel import job. */
+export function useFinishInstagramConnect() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => apiGet<Me>("/instagram/connect"),
-    onSuccess: (me) => queryClient.setQueryData(queryKeys.me, me),
+    mutationFn: (callback: InstagramCallback) => apiSend<InstagramConnected>("POST", "/instagram/callback", callback),
+    onSuccess: (connected) => {
+      queryClient.setQueryData<Me>(queryKeys.me, (me) => (me ? { ...me, instagram: connected.instagram } : me));
+      return queryClient.invalidateQueries({ queryKey: queryKeys.reels });
+    },
+  });
+}
+
+export function useDisconnectInstagram() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiSend<void>("DELETE", "/instagram/account"),
+    onSuccess: () => {
+      queryClient.setQueryData<Me>(queryKeys.me, (me) => (me ? { ...me, instagram: null } : me));
+      return queryClient.invalidateQueries({ queryKey: queryKeys.reels });
+    },
+  });
+}
+
+export function useDeleteAccount() {
+  return useMutation({ mutationFn: () => apiSend<void>("DELETE", "/me") });
+}
+
+const ACCEPTED_VIDEO_TYPES: readonly VideoContentType[] = ["video/mp4", "video/quicktime"];
+
+export function isAcceptedVideo(file: File): file is File & { type: VideoContentType } {
+  return ACCEPTED_VIDEO_TYPES.some((type) => type === file.type);
+}
+
+/**
+ * Uploads a reference reel straight to storage, then starts its DNA analysis. The video never
+ * passes through the API (apps/api/README.md, Reference reel upload).
+ */
+export function useUploadReference() {
+  return useMutation({
+    mutationFn: async (file: File & { type: VideoContentType }) => {
+      const upload = await apiSend<ReferenceUpload>("POST", "/reels/reference", {
+        filename: file.name,
+        content_type: file.type,
+        size_bytes: file.size,
+      });
+      const stored = await fetch(upload.upload_url, { method: "PUT", headers: upload.upload_headers, body: file });
+      if (!stored.ok) {
+        throw new Error("The upload did not finish. Check your connection and try again.");
+      }
+      return apiSend<JobAccepted>("POST", "/dna/analyse", { reel_id: upload.reel.id });
+    },
   });
 }
 
