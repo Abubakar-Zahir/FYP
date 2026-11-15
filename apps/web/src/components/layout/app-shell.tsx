@@ -1,10 +1,12 @@
 "use client";
 
-import { Menu, Settings2, Sparkles, X } from "lucide-react";
+import { LogOut, Menu, Settings2, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 
 import { useMe } from "@/lib/api/hooks";
+import { isAuthConfigured } from "@/lib/auth/supabase";
+import { useSignOut } from "@/lib/auth/use-sign-out";
 import { cn } from "@/lib/utils";
 
 import { MockScenarioSwitcher } from "./mock-scenario-switcher";
@@ -44,6 +46,21 @@ function AccountCard() {
   );
 }
 
+function SignOutButton() {
+  const signOut = useSignOut();
+  if (!isAuthConfigured()) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => void signOut()}
+      className="flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-muted transition-colors hover:bg-surface-strong hover:text-ink"
+    >
+      <LogOut aria-hidden className="size-4" />
+      Sign out
+    </button>
+  );
+}
+
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col gap-6">
@@ -57,6 +74,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="space-y-3">
         <MockScenarioSwitcher />
         <AccountCard />
+        <SignOutButton />
       </div>
     </div>
   );
