@@ -1,65 +1,113 @@
-import { ArrowRight, Eye, KeyRound, Trash2 } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 
-import { Serif } from "./section-heading";
+import { cn } from "@/lib/utils";
 
-const PRINCIPLES = [
-  { icon: KeyRound, title: "Official APIs only", text: "We connect through Instagram's own login. We never see or store your password." },
-  { icon: Trash2, title: "Your data, your call", text: "Disconnect and delete everything, videos and comments included, in one click." },
-  { icon: Eye, title: "Honest numbers", text: "We report what didn't work too. Every score shows the reasons behind it." },
+import { SectionHeading } from "./section-heading";
+
+type Plan = {
+  name: string;
+  price: string;
+  note: string;
+  points: { text: string; soon?: boolean }[];
+  cta: string;
+  featured?: boolean;
+};
+
+const PLANS: Plan[] = [
+  {
+    name: "Creators",
+    price: "Free",
+    note: "for the 5-week pilot · 15 spots",
+    points: [
+      { text: "Format DNA from reels you upload" },
+      { text: "Scripts and hooks in English, Urdu or Roman Urdu" },
+      { text: "Auto-edit with word-level captions" },
+      { text: "3 Trial Reel variants per video" },
+      { text: "Comment themes and a weekly report" },
+    ],
+    cta: "Apply for the pilot",
+    featured: true,
+  },
+  {
+    name: "Brands",
+    price: "Later",
+    note: "after the pilot",
+    points: [
+      { text: "Turn your comment section into product feedback" },
+      { text: "Scripts for your own reels, based on what works" },
+      { text: "Competitor formats, broken down", soon: true },
+      { text: "Creator matching", soon: true },
+    ],
+    cta: "Join the waitlist",
+  },
 ];
 
-const PILOT_FACTS = [
-  { value: "15", label: "creator spots" },
-  { value: "5", label: "weeks" },
-  { value: "Free", label: "during the pilot" },
-];
+const ASKS = ["1,000+ followers", "Public professional account", "A few reels a week"];
 
 export function PilotSection() {
   return (
-    <section id="pilot" className="scroll-mt-28 px-4 pt-12 pb-24 sm:px-6 sm:pb-32">
-      <div className="mx-auto max-w-6xl">
-        <ul className="grid gap-4 md:grid-cols-3">
-          {PRINCIPLES.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="reveal glass-inset p-6">
-              <Icon aria-hidden className="size-5 text-accent" />
-              <p className="mt-4 font-medium">{title}</p>
-              <p className="mt-1.5 text-sm text-muted">{text}</p>
-            </li>
-          ))}
-        </ul>
+    <section id="pilot" className="scroll-mt-10 px-4 py-20 sm:px-6 sm:py-28">
+      <SectionHeading
+        kicker="The pilot"
+        title="Free while we prove it works"
+        body="We're testing Reelmind with real creators for 5 weeks and reporting the results honestly, including what didn't work."
+      />
 
-        <div className="reveal glass relative mt-24 overflow-hidden px-6 py-16 text-center sm:px-12 sm:py-24">
-          <div aria-hidden className="absolute -top-1/2 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(167_139_250/0.35),transparent_65%)]" />
-          <div className="relative">
-            <p className="font-mono text-xs tracking-widest text-subtle uppercase">The pilot</p>
-            <h2 className="mx-auto mt-5 max-w-4xl text-[clamp(2.6rem,7vw,5.75rem)] leading-[0.92] font-semibold tracking-[-0.045em]">
-              Stop guessing.
-              <br />
-              <Serif className="text-gradient">Start knowing.</Serif>
-            </h2>
-            <p className="mx-auto mt-6 max-w-lg text-muted">
-              We&apos;re looking for creators with 1,000+ followers and a public account who post a few reels a week.
+      <ul className="mx-auto mt-6 flex flex-wrap justify-center gap-2">
+        {ASKS.map((ask) => (
+          <li key={ask} className="rounded-pill border border-edge bg-surface px-3 py-1 text-[13px] text-muted">
+            {ask}
+          </li>
+        ))}
+      </ul>
+
+      <div className="mx-auto mt-14 grid max-w-3xl gap-5 md:grid-cols-2">
+        {PLANS.map((plan) => (
+          <article
+            key={plan.name}
+            className={cn(
+              "reveal glass flex flex-col rounded-3xl p-7",
+              plan.featured && "border-accent/40 shadow-[0_20px_60px_-20px_rgb(255_0_135/0.45)]",
+            )}
+          >
+            <p className="flex items-center justify-between text-[15px] font-semibold">
+              {plan.name}
+              {plan.featured && (
+                <span className="bg-cta rounded-pill px-2.5 py-0.5 text-[11px] font-bold text-white">Open now</span>
+              )}
             </p>
+            <p className="mt-4 font-display text-5xl font-semibold tracking-[-0.045em]">{plan.price}</p>
+            <p className="mt-1 text-[13px] text-subtle">{plan.note}</p>
 
-            <dl className="mx-auto mt-10 flex max-w-md justify-center divide-x divide-edge">
-              {PILOT_FACTS.map((fact) => (
-                <div key={fact.label} className="flex flex-1 flex-col-reverse px-4">
-                  <dt className="mt-1 text-xs text-subtle">{fact.label}</dt>
-                  <dd className="text-3xl font-semibold tracking-tight sm:text-4xl">{fact.value}</dd>
-                </div>
+            <ul className="mt-7 flex-1 space-y-3">
+              {plan.points.map((point) => (
+                <li key={point.text} className="flex gap-2.5 text-[14.5px]">
+                  <Check aria-hidden className={cn("mt-0.5 size-4 shrink-0", plan.featured ? "text-accent" : "text-subtle")} />
+                  <span className="text-muted">
+                    {point.text}
+                    {point.soon && (
+                      <span className="ml-2 rounded-pill border border-edge-strong px-1.5 py-px align-middle text-[10px] tracking-wide text-subtle uppercase">
+                        Soon
+                      </span>
+                    )}
+                  </span>
+                </li>
               ))}
-            </dl>
+            </ul>
 
             <Link
               href="/login"
-              className="group mt-11 inline-flex h-14 items-center gap-2 rounded-pill bg-ink px-8 text-base font-semibold text-canvas transition-transform hover:scale-[1.03]"
+              className={cn(
+                "group mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-xl font-bold tracking-[-0.01em] transition-transform hover:scale-[1.02]",
+                plan.featured ? "bg-cta text-white shadow-glow" : "bg-cta-dark text-white",
+              )}
             >
-              Apply for the pilot
+              {plan.cta}
               <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
-          </div>
-        </div>
+          </article>
+        ))}
       </div>
     </section>
   );

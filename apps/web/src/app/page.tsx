@@ -1,28 +1,29 @@
-import { AudienceSection } from "@/components/landing/audience-section";
-import { CommentsSection } from "@/components/landing/comments-section";
-import { DnaSection } from "@/components/landing/dna-section";
+import { CommentsMarquee } from "@/components/landing/comments-marquee";
+import { ComparisonSection } from "@/components/landing/comparison-section";
+import { ExampleSection } from "@/components/landing/example-section";
+import { FaqSection } from "@/components/landing/faq-section";
+import { FeaturesGrid } from "@/components/landing/features-grid";
+import { FormatsSection } from "@/components/landing/formats-section";
 import { Hero } from "@/components/landing/hero";
-import { NicheMarquee } from "@/components/landing/niche-marquee";
+import { HowItWorks } from "@/components/landing/how-it-works";
 import { PilotSection } from "@/components/landing/pilot-section";
-import { ScriptSection } from "@/components/landing/script-section";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteHeader } from "@/components/landing/site-header";
-import { TrialSection } from "@/components/landing/trial-section";
 
 export default function LandingPage() {
   return (
-    <div className="relative overflow-x-clip">
-      <div aria-hidden className="grain pointer-events-none fixed inset-0 z-[60]" />
+    <div className="relative overflow-x-clip bg-canvas">
       <SiteHeader />
       <main>
         <Hero />
-        <NicheMarquee />
-        <DnaSection />
-        <ScriptSection />
-        <TrialSection />
-        <CommentsSection />
-        <AudienceSection />
+        <FormatsSection />
+        <HowItWorks />
+        <ExampleSection />
+        <CommentsMarquee />
         <PilotSection />
+        <FeaturesGrid />
+        <ComparisonSection />
+        <FaqSection />
       </main>
       <SiteFooter />
     </div>

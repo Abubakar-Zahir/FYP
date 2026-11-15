@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 
 const VARIANT_CLASSES = {
   primary:
-    "bg-accent text-on-accent shadow-glow hover:bg-accent-strong hover:text-ink disabled:bg-accent/40 disabled:shadow-none",
-  secondary: "border border-edge bg-surface-strong text-ink hover:bg-surface-hover hover:border-edge-strong",
+    "bg-cta text-on-accent font-semibold shadow-glow hover:brightness-110 disabled:opacity-50 disabled:shadow-none",
+  dark: "bg-cta-dark text-white font-semibold shadow-glass hover:brightness-125",
+  secondary: "border border-edge bg-surface text-ink shadow-glass hover:bg-surface-strong hover:border-edge-strong",
   ghost: "text-muted hover:bg-surface-strong hover:text-ink",
   danger: "border border-danger/40 bg-danger-soft text-danger hover:bg-danger/25",
 } as const;

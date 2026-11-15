@@ -1,10 +1,8 @@
-/** Slow-moving colored glows that give the glass panels something to blur. */
+/** Soft warm glows at the top of every page. Decoration only. */
 export function AmbientBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute -top-32 -left-24 size-[28rem] rounded-full bg-glow-1/40 blur-[110px] animate-[float_18s_ease-in-out_infinite]" />
-      <div className="absolute top-1/3 -right-32 size-[26rem] rounded-full bg-glow-2/30 blur-[120px] animate-[float_22s_ease-in-out_infinite_reverse]" />
-      <div className="absolute -bottom-40 left-1/3 size-[30rem] rounded-full bg-glow-3/25 blur-[120px] animate-[float_26s_ease-in-out_infinite]" />
+      <div className="absolute -top-48 left-1/2 h-[32rem] w-[60rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_142_224/0.35),rgb(255_196_160/0.25)_50%,transparent)] blur-3xl" />
     </div>
   );
 }

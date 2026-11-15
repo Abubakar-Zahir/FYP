@@ -6,88 +6,107 @@
  * text-muted, ...) and never hard-coded hex values.
  */
 @theme {
+  /* Type: Inter for headings, Geist for body text (same pairing and scale as the reference design) */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* Neutral base */
-  --color-canvas: #07060f;
-  --color-ink: #f5f3ff;
-  --color-muted: #b4b0cc;
-  --color-subtle: #827da0;
+  /* Neutral base: light */
+  --color-canvas: #ffffff;
+  --color-canvas-warm: #faf8f6;
+  --color-ink: #0a0b0d;
+  --color-muted: #565a63;
+  --color-subtle: #949aa4;
 
-  /* Glass layers: white at low alpha over the dark canvas */
-  --color-surface: rgb(255 255 255 / 0.06);
-  --color-surface-strong: rgb(255 255 255 / 0.1);
-  --color-surface-hover: rgb(255 255 255 / 0.14);
-  --color-edge: rgb(255 255 255 / 0.12);
-  --color-edge-strong: rgb(255 255 255 / 0.22);
+  /* Cards on the light canvas */
+  --color-surface: #ffffff;
+  --color-surface-strong: #f4f2f0;
+  --color-surface-hover: #efe9e5;
+  --color-edge: rgb(0 0 0 / 0.08);
+  --color-edge-strong: rgb(0 0 0 / 0.12);
 
-  /* One accent */
-  --color-accent: #a78bfa;
-  --color-accent-strong: #8b5cf6;
-  --color-accent-soft: rgb(167 139 250 / 0.18);
-  --color-accent-glow: #f0abfc;
-  --color-on-accent: #0b0716;
+  /* One accent: hot pink */
+  --color-accent: #ff0087;
+  --color-accent-strong: #d8006f;
+  --color-accent-soft: rgb(255 0 135 / 0.09);
+  --color-accent-glow: #ff4fae;
+  --color-on-accent: #ffffff;
 
   /* Status */
-  --color-success: #4ade80;
-  --color-success-soft: rgb(74 222 128 / 0.15);
-  --color-warning: #fbbf24;
-  --color-warning-soft: rgb(251 191 36 / 0.15);
-  --color-danger: #f87171;
-  --color-danger-soft: rgb(248 113 113 / 0.15);
+  --color-success: #16a34a;
+  --color-success-soft: rgb(22 163 74 / 0.1);
+  --color-warning: #ea580c;
+  --color-warning-soft: rgb(234 88 12 / 0.1);
+  --color-danger: #e01d1d;
+  --color-danger-soft: rgb(224 29 29 / 0.1);
 
-  /* Ambient glow colors behind the glass. Decoration only */
-  --color-glow-1: #7c3aed;
-  --color-glow-2: #db2777;
-  --color-glow-3: #0891b2;
+  /* Warm glows. Decoration only */
+  --color-glow-1: #ff4fae;
+  --color-glow-2: #ff6a00;
+  --color-glow-3: #ffc4a0;
+
+  /* Dark sections (comparison, footer) */
+  --color-night: #1a0a1e;
+  --color-night-2: #121214;
+  --color-on-dark: #f5f5f7;
+  --color-on-dark-soft: #a8a8ad;
 
   --radius-glass: 1.25rem;
   --radius-pill: 999px;
 
-  --blur-glass: 24px;
+  --blur-glass: 16px;
 
-  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.08);
-  --shadow-glow: 0 0 0 1px rgb(167 139 250 / 0.4), 0 8px 24px rgb(139 92 246 / 0.35);
+  --shadow-glass: 0 10px 30px rgb(0 0 0 / 0.08), 0 2px 8px rgb(0 0 0 / 0.04);
+  --shadow-lifted: 0 30px 60px rgb(0 0 0 / 0.12), 0 8px 20px rgb(0 0 0 / 0.06);
+  --shadow-glow: 0 10px 30px -8px rgb(255 0 135 / 0.55);
 }
 
-/* Frosted panel. Use for top-level cards only: backdrop blur is costly on phones */
+/* Card. Name kept from the glass theme so every screen picks up the new look */
 @utility glass {
   background-color: var(--color-surface);
   border: 1px solid var(--color-edge);
   border-radius: var(--radius-glass);
   box-shadow: var(--shadow-glass);
-  backdrop-filter: blur(var(--blur-glass)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(150%);
 }
 
-/* Inset tile inside a glass panel: translucent, no extra blur */
+/* Inset tile inside a card */
 @utility glass-inset {
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-strong);
   border: 1px solid var(--color-edge);
   border-radius: calc(var(--radius-glass) - 0.375rem);
 }
 
 @utility text-gradient {
-  background-image: linear-gradient(120deg, var(--color-ink), var(--color-accent));
+  background-image: linear-gradient(120deg, var(--color-accent-glow), var(--color-accent) 55%, var(--color-accent-strong));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
 }
 
+/* Main call to action: pink gradient */
+@utility bg-cta {
+  background-image: linear-gradient(180deg, #ff4fae 0%, #ff0087 55%, #d8006f 100%);
+}
+
+/* Secondary call to action: near-black gradient */
+@utility bg-cta-dark {
+  background-image: linear-gradient(180deg, rgb(30 32 38 / 0.94) 0%, rgb(10 11 14 / 0.96) 45%, rgb(0 0 0 / 0.97) 100%);
+}
+
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   background-color: var(--color-canvas);
-  background-image:
-    radial-gradient(60rem 40rem at 10% -10%, rgb(124 58 237 / 0.35), transparent 60%),
-    radial-gradient(50rem 35rem at 100% 10%, rgb(219 39 119 / 0.22), transparent 60%),
-    radial-gradient(45rem 35rem at 50% 110%, rgb(8 145 178 / 0.22), transparent 60%);
-  background-attachment: fixed;
   color: var(--color-ink);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
 }
 
 :focus-visible {
@@ -118,13 +137,6 @@ body {
   100% {
     transform: translateX(100%);
   }
-}
-
-/* Film grain over the landing page. An inline SVG noise tile, so no image request */
-@utility grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-  opacity: 0.18;
 }
 
 /*

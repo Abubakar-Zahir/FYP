@@ -46,9 +46,8 @@ function Phone({ phone }: { phone: PhoneScene }) {
     <div className={cn("absolute w-[44%] max-w-[15rem]", phone.className)}>
       <div
         className={cn(
-          "relative aspect-[9/19] overflow-hidden rounded-[2.2rem] border border-white/15 p-1.5 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)]",
-          "bg-gradient-to-b from-white/20 to-white/5",
-          phone.winner && "ring-2 ring-warning/70 shadow-[0_30px_100px_-10px_rgb(251_191_36/0.35)]",
+          "relative aspect-[9/19] overflow-hidden rounded-[2.2rem] border border-black/80 bg-ink p-1.5 text-white shadow-lifted",
+          phone.winner && "shadow-[0_30px_90px_-10px_rgb(255_0_135/0.45)]",
         )}
       >
         <div className={cn("relative size-full overflow-hidden rounded-[1.8rem]", phone.scene)}>
@@ -67,7 +66,7 @@ function Phone({ phone }: { phone: PhoneScene }) {
               {phone.views}
             </span>
             {phone.winner && (
-              <span className="flex items-center gap-1 rounded-pill bg-warning px-2 py-0.5 font-bold text-on-accent">
+              <span className="flex items-center gap-1 rounded-pill bg-cta px-2 py-0.5 font-bold text-white">
                 <Crown aria-hidden className="size-3" />
                 Winner
               </span>
@@ -86,7 +85,7 @@ function FloatingChip({ className, children }: { className: string; children: Re
   return (
     <div
       className={cn(
-        "glass absolute z-30 flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-xs shadow-[0_20px_50px_-15px_rgb(0_0_0/0.7)] sm:text-sm",
+        "glass absolute z-30 flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-left text-xs shadow-lifted sm:text-sm",
         className,
       )}
     >
@@ -99,7 +98,7 @@ function FloatingChip({ className, children }: { className: string; children: Re
 export function PhoneStack() {
   return (
     <div aria-hidden className="relative mx-auto aspect-[1/1] w-full max-w-[34rem] sm:aspect-[6/5]">
-      <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle,rgb(251_146_60/0.35),rgb(124_58_237/0.2)_45%,transparent_70%)] blur-2xl" />
+      <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle,rgb(255_0_135/0.35),rgb(255_122_46/0.2)_45%,transparent_70%)] blur-2xl" />
       {PHONES.map((phone) => (
         <Phone key={phone.label} phone={phone} />
       ))}

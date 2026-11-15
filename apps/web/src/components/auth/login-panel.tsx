@@ -40,7 +40,7 @@ export function LoginPanel() {
     <div className="grid w-full max-w-5xl overflow-hidden lg:grid-cols-[1.1fr_1fr] glass p-0 sm:p-0">
       <div className="relative hidden flex-col justify-between gap-10 border-r border-edge bg-gradient-to-br from-accent/20 via-transparent to-glow-2/15 p-10 lg:flex">
         <div className="flex items-center gap-2.5">
-          <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-accent to-glow-2 shadow-glow">
+          <span className="grid size-10 place-items-center rounded-xl bg-cta shadow-glow text-white">
             <Sparkles aria-hidden className="size-5" />
           </span>
           <span className="text-xl font-semibold">{APP_NAME}</span>

@@ -14,8 +14,8 @@ import { NavLinks, NavLinksFallback } from "./nav-links";
 function Logo() {
   return (
     <Link href="/dashboard" className="flex items-center gap-2.5 rounded-xl">
-      <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-accent to-glow-2 shadow-glow">
-        <Sparkles aria-hidden className="size-4 text-ink" />
+      <span className="grid size-9 place-items-center rounded-xl bg-cta shadow-glow text-white">
+        <Sparkles aria-hidden className="size-4" />
       </span>
       <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
     </Link>
@@ -75,7 +75,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
   return (
     <div className={cn("fixed inset-0 z-50 lg:hidden", !open && "pointer-events-none")} aria-hidden={!open}>
       <div
-        className={cn("absolute inset-0 bg-canvas/60 backdrop-blur-sm transition-opacity", open ? "opacity-100" : "opacity-0")}
+        className={cn("absolute inset-0 bg-ink/30 backdrop-blur-sm transition-opacity", open ? "opacity-100" : "opacity-0")}
         onClick={onClose}
       />
       <aside
