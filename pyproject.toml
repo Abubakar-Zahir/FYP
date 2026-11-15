@@ -23,6 +23,12 @@ dev = [
     "pytest>=8.3",
     "ruff>=0.6",
 ]
+video = [
+    "av>=17,<18",
+    "faster-whisper>=1.1",
+    "opencv-python-headless>=4.10",
+    "scenedetect>=0.7.2",
+]
 
 [tool.uv]
 package = false
@@ -46,7 +52,7 @@ explicit_package_bases = true
 
 # These libraries ship no type information.
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*"]
+module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

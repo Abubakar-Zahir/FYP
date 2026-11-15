@@ -6,7 +6,7 @@ Questions: can we pull useful signals from a reel on CPU, and how well does Whis
 
 ## What it does
 
-`extract.py` turns each reel into a `ReelSignals` JSON (`ml/dna/schema.py`): transcript with timings, cut times, pacing, the speech in the first 3 seconds, and one keyframe per scene.
+`extract.py` turns each reel into a `ReelSignals` JSON (`ml/dna/schema.py`) using `ml/dna/extract.py`, the same code the DNA worker runs. Its tests need the video group: `uv run --group video pytest ml/tests/test_extract.py`. It gives transcript with timings, cut times, pacing, the speech in the first 3 seconds, and one keyframe per scene.
 
 `whisper_wer.py` reports word error rate per language group.
 
