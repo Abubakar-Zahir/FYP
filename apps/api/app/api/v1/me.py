@@ -1,16 +1,12 @@
-from typing import Annotated
+from fastapi import APIRouter, Response, status
 
-from fastapi import APIRouter, Depends, Response, status
-
-from app.core.security import CurrentUser, get_current_user
+from app.core.security import CurrentUser, CurrentUserDependency
 from app.db.session import SessionDependency
 from app.models.user import User
 from app.schemas.me import MeResponse, Profile
 from app.services import users
 
 router = APIRouter(tags=["me"])
-
-CurrentUserDependency = Annotated[CurrentUser, Depends(get_current_user)]
 
 
 def _me_response(identity: CurrentUser, user: User | None) -> MeResponse:

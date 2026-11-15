@@ -6,13 +6,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.health import router as health_router
+from app.api.v1.jobs import router as jobs_router
 from app.api.v1.me import router as me_router
 from app.core.errors import register_error_handlers
 from app.core.security import TokenVerifier
 from app.core.settings import Settings, get_settings
 from app.db.session import create_engine, create_session_factory
+from app.workers.queue import CeleryJobQueue, JobQueue
 
 API_PREFIX = "/api/v1"
+
+
+def _job_queue(settings: Settings) -> JobQueue | None:
+    if not settings.redis_url:
+        return None
+    # Imported here so a server without Redis never builds a Celery app.
+    from app.workers.celery_app import create_celery
+
+    return CeleryJobQueue(create_celery(settings))
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -20,6 +31,7 @@ def create_app(settings: Settings) -> FastAPI:
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         engine = create_engine(settings.database_url) if settings.database_url else None
         application.state.session_factory = create_session_factory(engine) if engine else None
+        application.state.job_queue = _job_queue(settings)
         async with httpx.AsyncClient() as http:
             issuer = settings.supabase_issuer
             application.state.token_verifier = TokenVerifier(issuer, http) if issuer else None
@@ -37,6 +49,7 @@ def create_app(settings: Settings) -> FastAPI:
     register_error_handlers(application)
     application.include_router(health_router, prefix=API_PREFIX)
     application.include_router(me_router, prefix=API_PREFIX)
+    application.include_router(jobs_router, prefix=API_PREFIX)
     return application
 
 

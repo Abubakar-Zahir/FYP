@@ -43,3 +43,21 @@ Change tables only through new migrations, and never edit a merged one (`rules.m
 | `DELETE /api/v1/me` | Deletes this user's rows. Safe to repeat |
 
 The user always comes from the verified token, so no endpoint can reach another user's data. Email and name are read from the token and never stored here.
+
+## Jobs
+
+Long work (imports, DNA, scripts) runs in Celery workers, never in a request handler (`docs/backend.md`, Jobs).
+
+1. The endpoint writes a `jobs` row as `queued`, commits, and sends the task by name. It answers `202 {"job_id": ...}`.
+2. A worker runs the task through `app/workers/runner.py`, which sets `running`, then `done` with a result or `failed` with a stable error code.
+3. The client polls `GET /api/v1/jobs/{id}`. Someone else's job answers 404, the same as a missing one.
+
+Errors are codes, never exception text, because exception text can hold tokens or user data. `TransientJobError` retries with backoff. `JobFailure` fails at once.
+
+Set `REDIS_URL` (for example `redis://localhost:6379/0`), then start a worker from `apps/api`:
+
+```
+uv run celery -A app.workers.celery_app worker --queues default,ai -l info
+```
+
+Without `REDIS_URL`, endpoints that start jobs answer `503 jobs_not_configured`.

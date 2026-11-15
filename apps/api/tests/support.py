@@ -1,9 +1,11 @@
+from dataclasses import dataclass, field
 from pathlib import Path
 from uuid import UUID
 
 from alembic.config import Config
 from app.core.errors import ApiError
 from app.core.security import CurrentUser, TokenVerifier
+from app.workers.tasks import TaskName
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 USER_A = CurrentUser(id=UUID("11111111-1111-4111-8111-111111111111"), email="a@example.com", name="Ayesha")
@@ -31,3 +33,16 @@ def alembic_config(database_url: str) -> Config:
 
 def bearer(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
+
+
+@dataclass
+class FakeQueue:
+    """Records what would go to Celery. Set `fail` to simulate Redis being down."""
+
+    sent: list[tuple[TaskName, UUID]] = field(default_factory=list)
+    fail: bool = False
+
+    async def enqueue(self, task: TaskName, job_id: UUID) -> None:
+        if self.fail:
+            raise ConnectionError("redis down")
+        self.sent.append((task, job_id))

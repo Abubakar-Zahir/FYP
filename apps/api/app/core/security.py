@@ -141,3 +141,6 @@ async def get_current_user(
     if credentials is None:
         raise ApiError(status.HTTP_401_UNAUTHORIZED, "not_authenticated", "Sign in to continue.")
     return await verifier.verify(credentials.credentials)
+
+
+CurrentUserDependency = Annotated[CurrentUser, Depends(get_current_user)]
