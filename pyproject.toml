@@ -32,6 +32,9 @@ video = [
 
 [tool.uv]
 package = false
+# scenedetect requires the GUI build of OpenCV, which needs libGL and clashes with the
+# headless build. This marker never matches, so only opencv-python-headless is installed.
+override-dependencies = ["opencv-python; sys_platform == 'never'"]
 
 [tool.ruff]
 line-length = 110
