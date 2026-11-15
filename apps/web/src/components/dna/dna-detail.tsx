@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import { useDnaRecord } from "@/lib/api/hooks";
 import type { DnaRecord } from "@/lib/api/types";
+import { formatOutlier } from "@/lib/utils";
 import { HOOK_TYPE_LABEL, outlierTone } from "@/lib/utils/labels";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -20,7 +21,7 @@ function KeyFacts({ record }: { record: DnaRecord }) {
     { icon: Quote, label: "Hook type", value: HOOK_TYPE_LABEL[record.hook_type] },
     { icon: Zap, label: "Pacing", value: `${record.pacing_cuts_per_10s} cuts / 10 s` },
     { icon: Timer, label: "Length", value: `${record.length_s} s` },
-    { icon: Megaphone, label: "Outlier", value: `${record.outlier_score.toFixed(1)}× median` },
+    { icon: Megaphone, label: "Outlier", value: `${formatOutlier(record.outlier_score)} median` },
   ];
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -54,7 +55,7 @@ function DnaRecordView({ record }: { record: DnaRecord }) {
         <GlassCard>
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <Badge tone="accent">{HOOK_TYPE_LABEL[record.hook_type]}</Badge>
-            <Badge tone={outlierTone(record.outlier_score)}>{record.outlier_score.toFixed(1)}× median</Badge>
+            <Badge tone={outlierTone(record.outlier_score)}>{formatOutlier(record.outlier_score)} median</Badge>
           </div>
           <p dir="auto" className="text-xl font-medium sm:text-2xl">“{record.hook_text}”</p>
           <div className="mt-6">

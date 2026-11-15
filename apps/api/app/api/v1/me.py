@@ -18,7 +18,7 @@ def _me_response(identity: CurrentUser, user: User | None, account: InstagramAcc
         name=identity.name,
         email=identity.email,
         profile=Profile.model_validate(user) if user else None,
-        instagram=InstagramAccountOut.model_validate(account) if account else None,
+        instagram=InstagramAccountOut.from_account(account) if account else None,
     )
 
 

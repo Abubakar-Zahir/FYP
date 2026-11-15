@@ -50,7 +50,7 @@ async def finish_connect(
         )
     account = await instagram_accounts.connect(session, http, cipher, config, identity.id, callback.code)
     job = await jobs.start_job(session, queue, identity.id, TaskName.INSTAGRAM_IMPORT)
-    return InstagramConnected(instagram=InstagramAccountOut.model_validate(account), job_id=job.id)
+    return InstagramConnected(instagram=InstagramAccountOut.from_account(account), job_id=job.id)
 
 
 @router.post("/instagram/import", status_code=status.HTTP_202_ACCEPTED)

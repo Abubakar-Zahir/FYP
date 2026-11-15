@@ -20,17 +20,21 @@ export const meFixture: Me = {
 
 export const connectedInstagram: NonNullable<Me["instagram"]> = {
   username: "ayesha.eats.lahore",
-  account_type: "CREATOR",
-  trial_reels_eligible: true,
+  account_type: "MEDIA_CREATOR",
+  trial_reels_eligible: null,
 };
 
 export const reelsFixture: Reel[] = [
   {
     id: "reel_01",
+    source: "own",
+    title: "Imported reel 01",
+    permalink: null,
     caption: "Anarkali ki sab se crispy samosa chaat? 🥟 Rs 150 mein full value",
     posted_at: "2026-10-18T14:00:00Z",
     hook_type: "question",
     views: 184200,
+    reach: 132624,
     saves: 9120,
     shares: 4310,
     avg_watch_time_s: 11.4,
@@ -38,10 +42,14 @@ export const reelsFixture: Reel[] = [
   },
   {
     id: "reel_02",
+    source: "own",
+    title: "Imported reel 02",
+    permalink: null,
     caption: "3 nihari spots in Lahore ranked — #1 will surprise you",
     posted_at: "2026-10-15T13:30:00Z",
     hook_type: "list",
     views: 96500,
+    reach: 69480,
     saves: 7800,
     shares: 2105,
     avg_watch_time_s: 13.2,
@@ -49,10 +57,14 @@ export const reelsFixture: Reel[] = [
   },
   {
     id: "reel_03",
+    source: "own",
+    title: "Imported reel 03",
+    permalink: null,
     caption: "Maine 1 din sirf Rs 500 mein khana khaya. Possible hai?",
     posted_at: "2026-10-12T15:10:00Z",
     hook_type: "story",
     views: 61300,
+    reach: 44136,
     saves: 2210,
     shares: 980,
     avg_watch_time_s: 16.8,
@@ -60,10 +72,14 @@ export const reelsFixture: Reel[] = [
   },
   {
     id: "reel_04",
+    source: "own",
+    title: "Imported reel 04",
+    permalink: null,
     caption: "Stop ordering biryani from apps. Do this instead 👇",
     posted_at: "2026-10-09T12:45:00Z",
     hook_type: "bold_claim",
     views: 42100,
+    reach: 30312,
     saves: 1830,
     shares: 640,
     avg_watch_time_s: 8.9,
@@ -71,10 +87,14 @@ export const reelsFixture: Reel[] = [
   },
   {
     id: "reel_05",
+    source: "own",
+    title: "Imported reel 05",
+    permalink: null,
     caption: "Gawalmandi food street at 2am 🌙",
     posted_at: "2026-10-06T21:00:00Z",
     hook_type: "pattern_interrupt",
     views: 38800,
+    reach: 27936,
     saves: 1140,
     shares: 410,
     avg_watch_time_s: 7.2,
@@ -113,6 +133,8 @@ export const overviewFixture: AnalyticsOverview = {
 export const dnaFixture: DnaRecord[] = [
   {
     id: "dna_01",
+    reel_id: "reel_for_dna_01",
+    model_version: "openai_compatible:mock/dna-structure-v1",
     schema_version: "1.0",
     title: "Samosa chaat price reveal",
     source: "own",
@@ -140,6 +162,8 @@ export const dnaFixture: DnaRecord[] = [
   },
   {
     id: "dna_02",
+    reel_id: "reel_for_dna_02",
+    model_version: "openai_compatible:mock/dna-structure-v1",
     schema_version: "1.0",
     title: "Nihari ranking",
     source: "own",
@@ -166,6 +190,8 @@ export const dnaFixture: DnaRecord[] = [
   },
   {
     id: "dna_03",
+    reel_id: "reel_for_dna_03",
+    model_version: "openai_compatible:mock/dna-structure-v1",
     schema_version: "1.0",
     title: "Reference: 24h budget challenge",
     source: "reference",
@@ -193,6 +219,8 @@ export const dnaFixture: DnaRecord[] = [
   },
   {
     id: "dna_04",
+    reel_id: "reel_for_dna_04",
+    model_version: "openai_compatible:mock/dna-structure-v1",
     schema_version: "1.0",
     title: "Reference: Don't order this",
     source: "reference",
@@ -214,6 +242,8 @@ export const dnaFixture: DnaRecord[] = [
   },
   {
     id: "dna_05",
+    reel_id: "reel_for_dna_05",
+    model_version: "openai_compatible:mock/dna-structure-v1",
     schema_version: "1.0",
     title: "Food street night walk",
     source: "own",
@@ -241,7 +271,7 @@ export function buildScript(id: string, templateId: string, topic: string, langu
     template_id: templateId,
     topic,
     language,
-    model_version: "script-gen-0.1+llm-mock",
+    model_version: "openai_compatible:mock/script-v1",
     hooks: [
       {
         text: roman ? `${topic} — kya ye hype ke qabil hai?` : `Is ${topic} actually worth the hype?`,

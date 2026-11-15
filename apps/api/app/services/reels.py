@@ -49,10 +49,7 @@ async def list_reels(
     if len(rows) > limit:
         last_reel, last_at, _ = page[-1]
         next_cursor = encode_cursor(as_utc(last_at), last_reel.id)
-    items = [
-        ReelOut.model_validate(reel).model_copy(update={"hook_type": hook_type})
-        for reel, _, hook_type in page
-    ]
+    items = [ReelOut.from_reel(reel, hook_type) for reel, _, hook_type in page]
     return Page[ReelOut](items=items, next_cursor=next_cursor)
 
 
@@ -97,7 +94,7 @@ async def create_reference(
     await session.commit()
     await session.refresh(reel)
     return ReferenceUpload(
-        reel=ReelOut.model_validate(reel),
+        reel=ReelOut.from_reel(reel),
         upload_url=storage.upload_url(key, request.content_type.value, request.size_bytes),
         upload_headers={"Content-Type": request.content_type.value},
     )

@@ -8,7 +8,8 @@ import { CardHeader, GlassCard, InsetTile } from "@/components/ui/card";
 import { HookScoreCard } from "./hook-score-card";
 
 export function ScriptResult({ script }: { script: Script }) {
-  const sortedHooks = [...script.hooks].sort((a, b) => b.score - a.score);
+  // Unscored hooks (no scorer until Phase 2) keep the order the model wrote them in.
+  const sortedHooks = [...script.hooks].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
   return (
     <>

@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, StringConstraints
 
 from ml.scripts.schema import TOPIC_MAX_LENGTH, Angle, ScriptBeat, ScriptLanguage
 
@@ -19,9 +19,9 @@ class ScoreFactor(BaseModel):
 
 class ScoredHook(BaseModel):
     text: str
-    # The hook scorer arrives in Phase 2 (P2). Until then hooks are not scored.
-    score: float | None = None
-    top_factors: list[ScoreFactor] = Field(default_factory=list)
+    # The hook scorer arrives in Phase 2. Until then score is null and top_factors is empty.
+    score: float | None
+    top_factors: list[ScoreFactor]
 
 
 class ScriptOut(BaseModel):

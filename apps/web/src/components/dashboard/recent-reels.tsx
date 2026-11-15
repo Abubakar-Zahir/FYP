@@ -3,7 +3,7 @@
 import { Film } from "lucide-react";
 
 import { useReels } from "@/lib/api/hooks";
-import { formatCompact, formatSeconds, formatShortDate } from "@/lib/utils";
+import { formatCompact, formatOutlier, formatSeconds, formatShortDate } from "@/lib/utils";
 import { HOOK_TYPE_LABEL, outlierTone } from "@/lib/utils/labels";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -47,7 +47,7 @@ export function RecentReels() {
                 {page.items.map((reel) => (
                   <tr key={reel.id} className="border-t border-edge transition-colors hover:bg-surface">
                     <td className="max-w-72 px-2 py-3">
-                      <p dir="auto" className="truncate font-medium">{reel.caption}</p>
+                      <p dir="auto" className="truncate font-medium">{reel.caption ?? reel.title}</p>
                       <p className="text-xs text-subtle">{formatShortDate(reel.posted_at)}</p>
                     </td>
                     <td className="px-2 py-3 text-muted">{reel.hook_type ? HOOK_TYPE_LABEL[reel.hook_type] : "—"}</td>
@@ -56,7 +56,7 @@ export function RecentReels() {
                     <td className="px-2 py-3 text-right tabular-nums">{formatCompact(reel.shares)}</td>
                     <td className="px-2 py-3 text-right tabular-nums">{formatSeconds(reel.avg_watch_time_s)}</td>
                     <td className="px-2 py-3 text-right">
-                      <Badge tone={outlierTone(reel.outlier_score)}>{reel.outlier_score.toFixed(1)}×</Badge>
+                      <Badge tone={outlierTone(reel.outlier_score)}>{formatOutlier(reel.outlier_score)}</Badge>
                     </td>
                   </tr>
                 ))}

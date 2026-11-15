@@ -31,6 +31,17 @@ const profileSchema = z.object({
   goals: z.string().trim().min(5, "A short goal helps us rank ideas"),
 });
 
+/** Eligibility is only known after the first publish attempt, so null is shown as unknown. */
+function TrialReelsBadge({ eligible }: { eligible: boolean | null }) {
+  if (eligible === null) return <Badge>Trial Reels checked on first publish</Badge>;
+  return (
+    <Badge tone={eligible ? "success" : "warning"}>
+      <CircleCheck aria-hidden />
+      {eligible ? "Trial Reels available" : "Normal reels only"}
+    </Badge>
+  );
+}
+
 function InstagramConnect() {
   const me = useMe();
   const connect = useConnectInstagram();
@@ -53,10 +64,7 @@ function InstagramConnect() {
               <p className="text-xs text-subtle">{account.account_type.toLowerCase()} account</p>
             </div>
           </div>
-          <Badge tone={account.trial_reels_eligible ? "success" : "warning"}>
-            <CircleCheck aria-hidden />
-            {account.trial_reels_eligible ? "Trial Reels available" : "Normal reels only"}
-          </Badge>
+          <TrialReelsBadge eligible={account.trial_reels_eligible} />
         </div>
       ) : (
         <div className="space-y-3">

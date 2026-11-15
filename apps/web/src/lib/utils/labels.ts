@@ -20,7 +20,8 @@ export const COMMENT_LABEL: Record<CommentLabel, { label: string; tone: BadgeTon
 };
 
 /** Outlier score is views relative to the account median (FR-2.4). 1.0 means a typical reel. */
-export function outlierTone(score: number): BadgeTone {
+export function outlierTone(score: number | null): BadgeTone {
+  if (score === null) return "neutral";
   if (score >= 2) return "success";
   if (score >= 1) return "accent";
   return "neutral";
