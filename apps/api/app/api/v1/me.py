@@ -7,6 +7,7 @@ from app.models.user import User
 from app.schemas.instagram import InstagramAccountOut
 from app.schemas.me import MeResponse, Profile
 from app.services import instagram_accounts, users
+from app.services.storage import OptionalStorageDependency
 
 router = APIRouter(tags=["me"])
 
@@ -38,6 +39,8 @@ async def update_profile(
 
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_me(identity: CurrentUserDependency, session: SessionDependency) -> Response:
-    await users.delete_user(session, identity.id)
+async def delete_me(
+    identity: CurrentUserDependency, session: SessionDependency, storage: OptionalStorageDependency
+) -> Response:
+    await users.delete_user(session, storage, identity.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

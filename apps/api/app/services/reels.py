@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
-from uuid import UUID
+from pathlib import PurePath
+from uuid import UUID, uuid4
 
 from fastapi import status
 from sqlalchemy import and_, delete, func, or_, select
@@ -9,6 +10,8 @@ from app.core.errors import ApiError
 from app.core.pagination import Page, decode_cursor, encode_cursor
 from app.models.reel import Comment, Reel, ReelSource
 from app.schemas.reels import ReelOut
+from app.schemas.uploads import EXTENSIONS, ReferenceUpload, ReferenceUploadRequest
+from app.services.storage import Storage, storage_not_configured
 
 # Reels without a posted date (reference uploads) sort by when they were added.
 _SORT_AT = func.coalesce(Reel.posted_at, Reel.created_at)
@@ -53,3 +56,50 @@ async def delete_own_reels(session: AsyncSession, user_id: UUID) -> None:
     own = select(Reel.id).where(Reel.user_id == user_id, Reel.source == ReelSource.OWN)
     await session.execute(delete(Comment).where(Comment.reel_id.in_(own)))
     await session.execute(delete(Reel).where(Reel.user_id == user_id, Reel.source == ReelSource.OWN))
+
+
+def reference_key(user_id: UUID, reel_id: UUID, extension: str) -> str:
+    """Keys start with the user id, so one prefix holds everything a user uploaded."""
+    return f"users/{user_id}/reference/{reel_id}{extension}"
+
+
+def title_from_filename(filename: str) -> str:
+    # PurePath drops any folder part a browser sends, and the stem drops the extension.
+    return PurePath(filename.replace("\\", "/")).stem.strip() or "Reference reel"
+
+
+async def create_reference(
+    session: AsyncSession, storage: Storage, user_id: UUID, request: ReferenceUploadRequest
+) -> ReferenceUpload:
+    reel_id = uuid4()
+    key = reference_key(user_id, reel_id, EXTENSIONS[request.content_type])
+    reel = Reel(
+        id=reel_id,
+        user_id=user_id,
+        source=ReelSource.REFERENCE,
+        title=title_from_filename(request.filename),
+        r2_key=key,
+    )
+    session.add(reel)
+    await session.commit()
+    await session.refresh(reel)
+    return ReferenceUpload(
+        reel=ReelOut.model_validate(reel),
+        upload_url=storage.upload_url(key, request.content_type.value, request.size_bytes),
+        upload_headers={"Content-Type": request.content_type.value},
+    )
+
+
+async def delete_reel(session: AsyncSession, storage: Storage | None, reel: Reel) -> None:
+    if reel.r2_key:
+        if storage is None:
+            raise storage_not_configured()
+        await storage.delete([reel.r2_key])
+    await session.execute(delete(Comment).where(Comment.reel_id == reel.id))
+    await session.delete(reel)
+    await session.commit()
+
+
+async def stored_keys(session: AsyncSession, user_id: UUID) -> list[str]:
+    query = select(Reel.r2_key).where(Reel.user_id == user_id, Reel.r2_key.is_not(None))
+    return [key for key in (await session.execute(query)).scalars() if key]

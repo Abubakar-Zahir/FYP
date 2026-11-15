@@ -6,6 +6,7 @@ requires-python = "==3.12.*"
 dependencies = [
     "alembic>=1.13",
     "asyncpg>=0.30",
+    "boto3>=1.35",
     "celery[redis]>=5.4",
     "cryptography>=44",
     "fastapi[standard]>=0.115",
@@ -56,7 +57,7 @@ explicit_package_bases = true
 
 # These libraries ship no type information.
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*"]
+module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*", "boto3", "boto3.*", "botocore", "botocore.*"]
 ignore_missing_imports = true
 
 # Celery's task decorator is untyped. Only the thin task modules use it.

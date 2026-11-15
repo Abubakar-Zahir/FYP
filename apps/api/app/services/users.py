@@ -10,6 +10,8 @@ from app.models.llm_call import LlmCall
 from app.models.reel import Comment, Reel
 from app.models.user import User
 from app.schemas.me import Profile
+from app.services import reels
+from app.services.storage import Storage, storage_not_configured
 
 # Every table with a user_id, children before parents. A new user-owned table must be added here.
 USER_OWNED_MODELS: tuple[type[Comment] | type[Reel] | type[InstagramAccount] | type[Job], ...] = (
@@ -56,11 +58,17 @@ async def save_profile(session: AsyncSession, user_id: UUID, profile: Profile) -
     return created
 
 
-async def delete_user(session: AsyncSession, user_id: UUID) -> None:
-    """Removes every row the user owns, in one transaction (rules.md 6.5). Idempotent.
+async def delete_user(session: AsyncSession, storage: Storage | None, user_id: UUID) -> None:
+    """Removes every row and stored video the user owns (rules.md 6.5). Idempotent.
 
+    Files go first: if that fails, the rows still point at them and a retry can finish.
     LLM cost rows stay for the budget total but lose the link to the person.
     """
+    keys = await reels.stored_keys(session, user_id)
+    if keys:
+        if storage is None:
+            raise storage_not_configured()
+        await storage.delete(keys)
     for model in USER_OWNED_MODELS:
         await session.execute(delete(model).where(model.user_id == user_id))
     await session.execute(delete(User).where(User.id == user_id))
