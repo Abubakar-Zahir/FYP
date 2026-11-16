@@ -21,6 +21,10 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy apps/api ml
       - run: uv run pytest
+      - name: Check the OpenAPI schema the web app uses is up to date
+        run: |
+          PYTHONPATH=apps/api:. uv run python apps/api/scripts/export_openapi.py apps/web/openapi.json
+          git diff --exit-code apps/web/openapi.json
 
   e2e:
     runs-on: ubuntu-latest
@@ -45,6 +49,10 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Check the generated API types match openapi.json
+        run: |
+          pnpm --filter @fyp/web gen:api
+          git diff --exit-code apps/web/src/lib/api/schema.d.ts
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test

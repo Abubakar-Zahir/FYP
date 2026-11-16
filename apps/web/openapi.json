@@ -1,0 +1,1775 @@
+{
+  "components": {
+    "schemas": {
+      "AnalyseRequest": {
+        "properties": {
+          "reel_id": {
+            "format": "uuid",
+            "title": "Reel Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reel_id"
+        ],
+        "title": "AnalyseRequest",
+        "type": "object"
+      },
+      "Angle": {
+        "properties": {
+          "summary": {
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "summary"
+        ],
+        "title": "Angle",
+        "type": "object"
+      },
+      "Beat": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "end_s": {
+            "minimum": 0.0,
+            "title": "End S",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "start_s": {
+            "minimum": 0.0,
+            "title": "Start S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "start_s",
+          "end_s",
+          "description"
+        ],
+        "title": "Beat",
+        "type": "object"
+      },
+      "DnaRecordOut": {
+        "description": "What the DNA library and detail screens show. Field names match apps/web.",
+        "properties": {
+          "beats": {
+            "items": {
+              "$ref": "#/components/schemas/Beat"
+            },
+            "title": "Beats",
+            "type": "array"
+          },
+          "cta": {
+            "title": "Cta",
+            "type": "string"
+          },
+          "hook_text": {
+            "title": "Hook Text",
+            "type": "string"
+          },
+          "hook_type": {
+            "$ref": "#/components/schemas/HookType"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_template": {
+            "title": "Is Template",
+            "type": "boolean"
+          },
+          "length_s": {
+            "title": "Length S",
+            "type": "number"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "outlier_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outlier Score"
+          },
+          "overlays": {
+            "items": {
+              "$ref": "#/components/schemas/Overlay"
+            },
+            "title": "Overlays",
+            "type": "array"
+          },
+          "pacing_cuts_per_10s": {
+            "title": "Pacing Cuts Per 10S",
+            "type": "number"
+          },
+          "reel_id": {
+            "format": "uuid",
+            "title": "Reel Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ReelSource"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "transcript": {
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reel_id",
+          "schema_version",
+          "title",
+          "source",
+          "hook_type",
+          "hook_text",
+          "pacing_cuts_per_10s",
+          "length_s",
+          "beats",
+          "overlays",
+          "cta",
+          "outlier_score",
+          "transcript",
+          "is_template",
+          "model_version"
+        ],
+        "title": "DnaRecordOut",
+        "type": "object"
+      },
+      "GenerateScriptRequest": {
+        "properties": {
+          "language": {
+            "$ref": "#/components/schemas/ScriptLanguage"
+          },
+          "template_id": {
+            "format": "uuid",
+            "title": "Template Id",
+            "type": "string"
+          },
+          "topic": {
+            "maxLength": 300,
+            "minLength": 2,
+            "title": "Topic",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_id",
+          "topic",
+          "language"
+        ],
+        "title": "GenerateScriptRequest",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "HookType": {
+        "enum": [
+          "question",
+          "bold_claim",
+          "pattern_interrupt",
+          "story",
+          "list",
+          "other"
+        ],
+        "title": "HookType",
+        "type": "string"
+      },
+      "InstagramAccountOut": {
+        "properties": {
+          "account_type": {
+            "title": "Account Type",
+            "type": "string"
+          },
+          "trial_reels_eligible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trial Reels Eligible"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "account_type",
+          "trial_reels_eligible"
+        ],
+        "title": "InstagramAccountOut",
+        "type": "object"
+      },
+      "InstagramAuthorizeUrl": {
+        "properties": {
+          "authorize_url": {
+            "title": "Authorize Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authorize_url"
+        ],
+        "title": "InstagramAuthorizeUrl",
+        "type": "object"
+      },
+      "InstagramCallback": {
+        "description": "What the web app's callback page forwards from Instagram's redirect.",
+        "properties": {
+          "code": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          },
+          "state": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "state"
+        ],
+        "title": "InstagramCallback",
+        "type": "object"
+      },
+      "InstagramConnected": {
+        "description": "The account, plus the reel import job that connecting starts.",
+        "properties": {
+          "instagram": {
+            "$ref": "#/components/schemas/InstagramAccountOut"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "instagram"
+        ],
+        "title": "InstagramConnected",
+        "type": "object"
+      },
+      "JobAccepted": {
+        "description": "The 202 body for every endpoint that starts long work (rules.md 3b.2).",
+        "properties": {
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "JobAccepted",
+        "type": "object"
+      },
+      "JobOut": {
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "progress": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobStatus"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "progress",
+          "result",
+          "error"
+        ],
+        "title": "JobOut",
+        "type": "object"
+      },
+      "JobStatus": {
+        "enum": [
+          "queued",
+          "running",
+          "done",
+          "failed"
+        ],
+        "title": "JobStatus",
+        "type": "string"
+      },
+      "Language": {
+        "enum": [
+          "english",
+          "urdu",
+          "roman_urdu"
+        ],
+        "title": "Language",
+        "type": "string"
+      },
+      "MeResponse": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instagram": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InstagramAccountOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Profile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "profile",
+          "instagram"
+        ],
+        "title": "MeResponse",
+        "type": "object"
+      },
+      "Overlay": {
+        "properties": {
+          "at_s": {
+            "minimum": 0.0,
+            "title": "At S",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at_s",
+          "text"
+        ],
+        "title": "Overlay",
+        "type": "object"
+      },
+      "Page_DnaRecordOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DnaRecordOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[DnaRecordOut]",
+        "type": "object"
+      },
+      "Page_ReelOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReelOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[ReelOut]",
+        "type": "object"
+      },
+      "Profile": {
+        "description": "Same fields and limits as the onboarding form in apps/web.",
+        "properties": {
+          "goals": {
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Goals",
+            "type": "string"
+          },
+          "language_mix": {
+            "items": {
+              "$ref": "#/components/schemas/Language"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Language Mix",
+            "type": "array"
+          },
+          "niche": {
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Niche",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "tone": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Tone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "niche",
+          "language_mix",
+          "tone",
+          "goals"
+        ],
+        "title": "Profile",
+        "type": "object"
+      },
+      "ReelOut": {
+        "description": "Metrics are null when Instagram has no value yet. Null is not zero.",
+        "properties": {
+          "avg_watch_time_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Watch Time S"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "hook_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HookType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "outlier_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outlier Score"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          },
+          "posted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Posted At"
+          },
+          "reach": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reach"
+          },
+          "saves": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saves"
+          },
+          "shares": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shares"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ReelSource"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "title",
+          "caption",
+          "permalink",
+          "posted_at",
+          "views",
+          "reach",
+          "saves",
+          "shares",
+          "avg_watch_time_s",
+          "outlier_score",
+          "hook_type"
+        ],
+        "title": "ReelOut",
+        "type": "object"
+      },
+      "ReelSource": {
+        "enum": [
+          "own",
+          "reference"
+        ],
+        "title": "ReelSource",
+        "type": "string"
+      },
+      "ReferenceUpload": {
+        "description": "PUT the file to `upload_url` with exactly these headers, then call POST /dna/analyse.",
+        "properties": {
+          "reel": {
+            "$ref": "#/components/schemas/ReelOut"
+          },
+          "upload_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Upload Headers",
+            "type": "object"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reel",
+          "upload_url",
+          "upload_headers"
+        ],
+        "title": "ReferenceUpload",
+        "type": "object"
+      },
+      "ReferenceUploadRequest": {
+        "properties": {
+          "content_type": {
+            "$ref": "#/components/schemas/VideoContentType"
+          },
+          "filename": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Filename",
+            "type": "string"
+          },
+          "size_bytes": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 209715200.0,
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "filename",
+          "content_type",
+          "size_bytes"
+        ],
+        "title": "ReferenceUploadRequest",
+        "type": "object"
+      },
+      "Role": {
+        "enum": [
+          "creator",
+          "brand"
+        ],
+        "title": "Role",
+        "type": "string"
+      },
+      "ScoreFactor": {
+        "properties": {
+          "impact": {
+            "title": "Impact",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "impact"
+        ],
+        "title": "ScoreFactor",
+        "type": "object"
+      },
+      "ScoredHook": {
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "top_factors": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreFactor"
+            },
+            "title": "Top Factors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "text",
+          "score",
+          "top_factors"
+        ],
+        "title": "ScoredHook",
+        "type": "object"
+      },
+      "ScriptBeat": {
+        "properties": {
+          "beat": {
+            "minLength": 1,
+            "title": "Beat",
+            "type": "string"
+          },
+          "line": {
+            "minLength": 1,
+            "title": "Line",
+            "type": "string"
+          },
+          "shot": {
+            "minLength": 1,
+            "title": "Shot",
+            "type": "string"
+          }
+        },
+        "required": [
+          "beat",
+          "line",
+          "shot"
+        ],
+        "title": "ScriptBeat",
+        "type": "object"
+      },
+      "ScriptLanguage": {
+        "enum": [
+          "english",
+          "roman_urdu",
+          "mixed"
+        ],
+        "title": "ScriptLanguage",
+        "type": "string"
+      },
+      "ScriptOut": {
+        "description": "Field names match apps/web.",
+        "properties": {
+          "angles": {
+            "items": {
+              "$ref": "#/components/schemas/Angle"
+            },
+            "title": "Angles",
+            "type": "array"
+          },
+          "body": {
+            "items": {
+              "$ref": "#/components/schemas/ScriptBeat"
+            },
+            "title": "Body",
+            "type": "array"
+          },
+          "hooks": {
+            "items": {
+              "$ref": "#/components/schemas/ScoredHook"
+            },
+            "title": "Hooks",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/ScriptLanguage"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "template_id": {
+            "format": "uuid",
+            "title": "Template Id",
+            "type": "string"
+          },
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "template_id",
+          "topic",
+          "language",
+          "hooks",
+          "angles",
+          "body",
+          "model_version"
+        ],
+        "title": "ScriptOut",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VideoContentType": {
+        "enum": [
+          "video/mp4",
+          "video/quicktime"
+        ],
+        "title": "VideoContentType",
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "AI Content Intelligence Platform",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/dna": {
+      "get": {
+        "operationId": "list_dna_api_v1_dna_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "templates_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Templates Only",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_DnaRecordOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Dna",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
+    "/api/v1/dna/analyse": {
+      "post": {
+        "description": "Poll the job. When done, its result holds `dna_id`.",
+        "operationId": "analyse_api_v1_dna_analyse_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Analyse",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
+    "/api/v1/dna/{dna_id}": {
+      "get": {
+        "operationId": "read_dna_api_v1_dna__dna_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dna_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Dna Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DnaRecordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Dna",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
+    "/api/v1/dna/{dna_id}/save-template": {
+      "post": {
+        "description": "A template is a DNA record the creator wants to write scripts from.",
+        "operationId": "save_template_api_v1_dna__dna_id__save_template_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dna_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Dna Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DnaRecordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Save Template",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "read_health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Read Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/instagram/account": {
+      "delete": {
+        "operationId": "disconnect_api_v1_instagram_account_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Disconnect",
+        "tags": [
+          "instagram"
+        ]
+      }
+    },
+    "/api/v1/instagram/callback": {
+      "post": {
+        "operationId": "finish_connect_api_v1_instagram_callback_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstagramCallback"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstagramConnected"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Finish Connect",
+        "tags": [
+          "instagram"
+        ]
+      }
+    },
+    "/api/v1/instagram/connect": {
+      "get": {
+        "description": "The web app sends the browser to this URL. Instagram redirects back with a code.",
+        "operationId": "start_connect_api_v1_instagram_connect_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstagramAuthorizeUrl"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Start Connect",
+        "tags": [
+          "instagram"
+        ]
+      }
+    },
+    "/api/v1/instagram/import": {
+      "post": {
+        "operationId": "start_import_api_v1_instagram_import_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Start Import",
+        "tags": [
+          "instagram"
+        ]
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "operationId": "read_job_api_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/me": {
+      "delete": {
+        "operationId": "delete_me_api_v1_me_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Me",
+        "tags": [
+          "me"
+        ]
+      },
+      "get": {
+        "operationId": "read_me_api_v1_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Me",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/profile": {
+      "put": {
+        "operationId": "update_profile_api_v1_me_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Profile",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/reels": {
+      "get": {
+        "description": "Newest first. Pass `next_cursor` back as `cursor` for the next page.",
+        "operationId": "list_reels_api_v1_reels_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReelSource"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ReelOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Reels",
+        "tags": [
+          "reels"
+        ]
+      }
+    },
+    "/api/v1/reels/reference": {
+      "post": {
+        "description": "Reference reels are uploaded files only, never links (CLAUDE.md hard constraint 1).",
+        "operationId": "create_reference_reel_api_v1_reels_reference_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUpload"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Reference Reel",
+        "tags": [
+          "reels"
+        ]
+      }
+    },
+    "/api/v1/reels/{reel_id}": {
+      "delete": {
+        "operationId": "delete_reel_api_v1_reels__reel_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reel_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reel Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Reel",
+        "tags": [
+          "reels"
+        ]
+      }
+    },
+    "/api/v1/scripts/generate": {
+      "post": {
+        "description": "Poll the job. When done, its result holds `script_id`.",
+        "operationId": "generate_script_api_v1_scripts_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateScriptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Generate Script",
+        "tags": [
+          "scripts"
+        ]
+      }
+    },
+    "/api/v1/scripts/{script_id}": {
+      "get": {
+        "operationId": "read_script_api_v1_scripts__script_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "script_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Script Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScriptOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Script",
+        "tags": [
+          "scripts"
+        ]
+      }
+    }
+  }
+}

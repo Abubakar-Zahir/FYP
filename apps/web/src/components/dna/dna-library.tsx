@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { useDnaRecords, useSaveTemplate } from "@/lib/api/hooks";
 import type { DnaRecord, HookType } from "@/lib/api/types";
+import { formatOutlier } from "@/lib/utils";
 import { HOOK_TYPE_LABEL, outlierTone } from "@/lib/utils/labels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ function DnaCard({ record }: { record: DnaRecord }) {
     <GlassCard className="group relative flex flex-col gap-4 p-5 transition-all hover:-translate-y-0.5 hover:border-edge-strong">
       <div className="flex items-start justify-between gap-3">
         <Badge tone="accent">{HOOK_TYPE_LABEL[record.hook_type]}</Badge>
-        <Badge tone={outlierTone(record.outlier_score)}>{record.outlier_score.toFixed(1)}× median</Badge>
+        <Badge tone={outlierTone(record.outlier_score)}>{formatOutlier(record.outlier_score)} median</Badge>
       </div>
       <div>
         <h2 className="font-semibold">

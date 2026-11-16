@@ -34,16 +34,32 @@ function ScoreRing({ score }: { score: number }) {
   );
 }
 
+function UnscoredHook({ hook, rank }: { hook: ScoredHook; rank: number }) {
+  return (
+    <div className={cn("glass-inset flex items-start gap-4 p-4", rank === 1 && "border-accent/50 bg-accent-soft")}>
+      <span className="grid size-14 shrink-0 place-items-center rounded-full border border-edge text-xs text-subtle">
+        #{rank}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p dir="auto" className="font-medium">{hook.text}</p>
+        <p className="mt-1.5 text-xs text-subtle">Not scored yet. The hook scorer arrives in Phase 2.</p>
+      </div>
+    </div>
+  );
+}
+
 /** Score always ships with its top 3 factors (NFR-10, frontend.md UI rule 3). */
 export function HookScoreCard({ hook, rank }: { hook: ScoredHook; rank: number }) {
+  if (hook.score === null) return <UnscoredHook hook={hook} rank={rank} />;
+  const score = hook.score;
   const maxImpact = Math.max(...hook.top_factors.map((factor) => Math.abs(factor.impact)));
 
   return (
     <div className={cn("glass-inset flex gap-4 p-4", rank === 1 && "border-accent/50 bg-accent-soft")}>
-      <ScoreRing score={hook.score} />
+      <ScoreRing score={score} />
       <div className="min-w-0 flex-1">
         <p dir="auto" className="font-medium">
-          <span className="sr-only">Score {hook.score} out of 100. </span>
+          <span className="sr-only">Score {score} out of 100. </span>
           {hook.text}
         </p>
         <ul className="mt-2.5 space-y-1.5" aria-label="Top factors">

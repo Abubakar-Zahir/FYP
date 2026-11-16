@@ -1,7 +1,8 @@
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, StringConstraints
 
+from app.models.instagram_account import InstagramAccount
 from app.schemas.jobs import JobAccepted
 
 CODE_MAX_LENGTH = 2000
@@ -20,12 +21,14 @@ class InstagramCallback(BaseModel):
 
 
 class InstagramAccountOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     username: str
     account_type: str
     # Unknown until the first Trial Reel publish answers (P0-09 and Phase 3).
-    trial_reels_eligible: bool | None = None
+    trial_reels_eligible: bool | None
+
+    @classmethod
+    def from_account(cls, account: InstagramAccount) -> "InstagramAccountOut":
+        return cls(username=account.username, account_type=account.account_type, trial_reels_eligible=None)
 
 
 class InstagramConnected(JobAccepted):
