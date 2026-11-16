@@ -18,6 +18,7 @@ class TaskName(StrEnum):
     DNA_ANALYSE = "dna.analyse"
     SCRIPTS_GENERATE = "scripts.generate"
     COMMENTS_SYNC = "comments.sync"
+    HOOKS_SCORE = "hooks.score"
 
 
 TASK_QUEUES: dict[TaskName, Queue] = {
@@ -26,4 +27,5 @@ TASK_QUEUES: dict[TaskName, Queue] = {
     TaskName.DNA_ANALYSE: Queue.VIDEO,
     TaskName.SCRIPTS_GENERATE: Queue.AI,
     TaskName.COMMENTS_SYNC: Queue.AI,
+    TaskName.HOOKS_SCORE: Queue.AI,
 }

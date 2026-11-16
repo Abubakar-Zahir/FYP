@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     # Whisper size for the DNA worker. P0-11 compares tiny and small on Urdu.
     # A .joblib file from ml.comments.train, or a folder from the XLM-R notebook (nlp group).
     comment_model_path: str | None = None
+    # A folder saved by ml.scoring.train. Without it, hooks stay unscored.
+    hook_scorer_path: str | None = None
     whisper_model: str = "small"
     dna_cut_threshold: float = Field(default=27.0, gt=0)
 

@@ -52,7 +52,7 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP", "S", "T20"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**" = ["S101"]
+"**/tests/**" = ["S101", "S311"]
 "spikes/**" = ["T20", "S603", "S607"]
 # Command-line entry points that report results to the person running them.
 "ml/**/train.py" = ["T20"]
@@ -67,7 +67,7 @@ explicit_package_bases = true
 
 # These libraries ship no type information.
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*", "boto3", "boto3.*", "botocore", "botocore.*", "sklearn", "sklearn.*", "joblib", "joblib.*", "lightgbm", "lightgbm.*", "onnxruntime", "onnxruntime.*", "tokenizers", "tokenizers.*"]
+module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*", "boto3", "boto3.*", "botocore", "botocore.*", "sklearn", "sklearn.*", "joblib", "joblib.*", "lightgbm", "lightgbm.*", "onnxruntime", "onnxruntime.*", "tokenizers", "tokenizers.*", "scipy", "scipy.*"]
 ignore_missing_imports = true
 
 # Celery's task decorator is untyped. Only the thin task modules use it.

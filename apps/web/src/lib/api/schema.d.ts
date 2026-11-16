@@ -149,6 +149,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hooks/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Score Hooks
+         * @description Scores up to 10 hooks. The job result holds `hooks` in the ScoredHook shape and `model_version`.
+         */
+        post: operations["score_hooks_api_v1_hooks_score_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/instagram/account": {
         parameters: {
             query?: never;
@@ -495,6 +515,12 @@ export interface components {
             status: string;
             /** Version */
             version: string;
+        };
+        /** HookScoreRequest */
+        HookScoreRequest: {
+            hook_type?: components["schemas"]["HookType"] | null;
+            /** Hooks */
+            hooks: string[];
         };
         /**
          * HookType
@@ -992,6 +1018,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    score_hooks_api_v1_hooks_score_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HookScoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
