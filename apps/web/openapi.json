@@ -15,6 +15,44 @@
         "title": "AnalyseRequest",
         "type": "object"
       },
+      "AnalyticsOverview": {
+        "description": "Field names match apps/web. `change` is the fraction up or down on the previous period.",
+        "properties": {
+          "best_formats": {
+            "items": {
+              "$ref": "#/components/schemas/FormatPerformance"
+            },
+            "title": "Best Formats",
+            "type": "array"
+          },
+          "change": {
+            "$ref": "#/components/schemas/Totals"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Totals"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "title": "Trend",
+            "type": "array"
+          }
+        },
+        "required": [
+          "period_days",
+          "totals",
+          "change",
+          "trend",
+          "best_formats"
+        ],
+        "title": "AnalyticsOverview",
+        "type": "object"
+      },
       "Angle": {
         "properties": {
           "summary": {
@@ -461,6 +499,28 @@
         "title": "ExperimentStatus",
         "type": "string"
       },
+      "FormatPerformance": {
+        "properties": {
+          "hook_type": {
+            "$ref": "#/components/schemas/HookType"
+          },
+          "median_outlier": {
+            "title": "Median Outlier",
+            "type": "number"
+          },
+          "reels": {
+            "title": "Reels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "hook_type",
+          "reels",
+          "median_outlier"
+        ],
+        "title": "FormatPerformance",
+        "type": "object"
+      },
       "GenerateScriptRequest": {
         "properties": {
           "language": {
@@ -557,6 +617,24 @@
         "title": "HookType",
         "type": "string"
       },
+      "Idea": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "why"
+        ],
+        "title": "Idea",
+        "type": "object"
+      },
       "InsightWindow": {
         "enum": [
           "24h",
@@ -648,6 +726,24 @@
           "instagram"
         ],
         "title": "InstagramConnected",
+        "type": "object"
+      },
+      "Item": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "detail"
+        ],
+        "title": "Item",
         "type": "object"
       },
       "JobAccepted": {
@@ -1348,6 +1444,57 @@
         "title": "ScriptOut",
         "type": "object"
       },
+      "Totals": {
+        "properties": {
+          "avg_watch_time_s": {
+            "title": "Avg Watch Time S",
+            "type": "number"
+          },
+          "reach": {
+            "title": "Reach",
+            "type": "number"
+          },
+          "saves": {
+            "title": "Saves",
+            "type": "number"
+          },
+          "shares": {
+            "title": "Shares",
+            "type": "number"
+          },
+          "views": {
+            "title": "Views",
+            "type": "number"
+          }
+        },
+        "required": [
+          "views",
+          "reach",
+          "saves",
+          "shares",
+          "avg_watch_time_s"
+        ],
+        "title": "Totals",
+        "type": "object"
+      },
+      "TrendPoint": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "views": {
+            "title": "Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "views"
+        ],
+        "title": "TrendPoint",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1627,6 +1774,57 @@
         ],
         "title": "VideoUpload",
         "type": "object"
+      },
+      "WeeklyReportContent": {
+        "description": "Field names match apps/web.",
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "ideas": {
+            "items": {
+              "$ref": "#/components/schemas/Idea"
+            },
+            "title": "Ideas",
+            "type": "array"
+          },
+          "losses": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "title": "Losses",
+            "type": "array"
+          },
+          "themes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "week_start": {
+            "title": "Week Start",
+            "type": "string"
+          },
+          "wins": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "title": "Wins",
+            "type": "array"
+          }
+        },
+        "required": [
+          "week_start",
+          "headline",
+          "wins",
+          "losses",
+          "themes",
+          "ideas"
+        ],
+        "title": "WeeklyReportContent",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1642,6 +1840,33 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/analytics/overview": {
+      "get": {
+        "description": "The last 30 days against the 30 before, from imported reels.",
+        "operationId": "read_overview_api_v1_analytics_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Overview",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
     "/api/v1/comments/summary": {
       "get": {
         "operationId": "read_summary_api_v1_comments_summary_get",
@@ -2724,6 +2949,57 @@
         "summary": "Delete Reel",
         "tags": [
           "reels"
+        ]
+      }
+    },
+    "/api/v1/reports/weekly": {
+      "get": {
+        "description": "The latest report. A new one is built every Monday, or on request.",
+        "operationId": "read_weekly_report_api_v1_reports_weekly_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyReportContent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Weekly Report",
+        "tags": [
+          "analytics"
+        ]
+      },
+      "post": {
+        "operationId": "build_weekly_report_api_v1_reports_weekly_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Build Weekly Report",
+        "tags": [
+          "analytics"
         ]
       }
     },

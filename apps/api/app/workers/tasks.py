@@ -23,6 +23,8 @@ class TaskName(StrEnum):
     EXPERIMENTS_CREATE = "experiments.create"
     EXPERIMENTS_PUBLISH = "experiments.publish"
     EXPERIMENTS_COLLECT_INSIGHTS = "experiments.collect_insights"
+    REPORTS_WEEKLY = "reports.weekly"
+    REPORTS_WEEKLY_ALL = "reports.weekly_all"
 
 
 TASK_QUEUES: dict[TaskName, Queue] = {
@@ -37,4 +39,6 @@ TASK_QUEUES: dict[TaskName, Queue] = {
     # Publishing renders each variant's hook overlay with FFmpeg first.
     TaskName.EXPERIMENTS_PUBLISH: Queue.VIDEO,
     TaskName.EXPERIMENTS_COLLECT_INSIGHTS: Queue.DEFAULT,
+    TaskName.REPORTS_WEEKLY: Queue.DEFAULT,
+    TaskName.REPORTS_WEEKLY_ALL: Queue.DEFAULT,
 }

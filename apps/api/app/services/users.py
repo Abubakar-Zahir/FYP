@@ -10,6 +10,7 @@ from app.models.instagram_account import InstagramAccount
 from app.models.job import Job
 from app.models.llm_call import LlmCall
 from app.models.reel import Comment, CommentTheme, Reel
+from app.models.report import WeeklyReport
 from app.models.script import Script
 from app.models.user import User
 from app.models.video import Video
@@ -19,7 +20,8 @@ from app.services.storage import Storage, storage_not_configured
 
 # Every table with a user_id, children before parents. A new user-owned table must be added here.
 USER_OWNED_MODELS: tuple[
-    type[VariantInsight]
+    type[WeeklyReport]
+    | type[VariantInsight]
     | type[Variant]
     | type[Experiment]
     | type[BanditBelief]
@@ -33,6 +35,7 @@ USER_OWNED_MODELS: tuple[
     | type[Job],
     ...,
 ] = (
+    WeeklyReport,
     VariantInsight,
     Variant,
     Experiment,

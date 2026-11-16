@@ -6,6 +6,7 @@ On Windows, use `;` instead of `:` in PYTHONPATH and add `--pool=solo`.
 """
 
 from celery import Celery
+from celery.schedules import crontab
 
 from app.core.settings import Settings, get_settings
 from app.workers.tasks import TASK_QUEUES, Queue, TaskName
@@ -17,6 +18,7 @@ TASK_MODULES = [
     "app.workers.comment_tasks",
     "app.workers.video_tasks",
     "app.workers.experiment_tasks",
+    "app.workers.report_tasks",
 ]
 TOKEN_REFRESH_EVERY_S = 24 * 60 * 60
 INSIGHTS_EVERY_S = 30 * 60
@@ -50,6 +52,11 @@ def create_celery(settings: Settings) -> Celery:
             "collect-variant-insights": {
                 "task": TaskName.EXPERIMENTS_COLLECT_INSIGHTS.value,
                 "schedule": INSIGHTS_EVERY_S,
+            },
+            # Monday 06:00 UTC, which is 11:00 in Pakistan.
+            "weekly-reports": {
+                "task": TaskName.REPORTS_WEEKLY_ALL.value,
+                "schedule": crontab(minute=0, hour=6, day_of_week=1),
             },
         },
     )

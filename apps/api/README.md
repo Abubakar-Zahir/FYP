@@ -175,3 +175,14 @@ The `ml/edit/` code holds the cut, caption, transliteration and render logic. Th
    - A retry never republishes a variant that is already live.
 3. Every 30 minutes, the `beat` task `experiments.collect_insights` stores insights at 24 h (preliminary, data can lag) and 72 h. Once every live variant has 72 h numbers, it picks the winner on views, and the learner records whether each variant beat the creator's median views.
 4. `POST /api/v1/experiments/{id}/share-winner` records the request and returns `share_instructions`. The API can't share a Trial Reel with followers, so the creator does it in the app.
+
+## Analytics and weekly report
+
+`GET /api/v1/analytics/overview` sums the last 30 days of imported reels against the 30 before. It returns daily views, plus the best formats by hook type (median outlier score).
+
+The weekly report (`ml/reports/weekly.py`) is built from the creator's own data with plain rules, no LLM:
+- wins and losses against the creator's usual views;
+- comment themes and their ideas;
+- the variant learner's findings once a feature has 3 or more tests and wins more than half.
+
+The `beat` service builds it every Monday at 06:00 UTC. `POST /api/v1/reports/weekly` rebuilds it now, and `GET /api/v1/reports/weekly` returns the latest one.
