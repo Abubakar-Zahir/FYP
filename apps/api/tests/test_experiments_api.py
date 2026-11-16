@@ -17,7 +17,7 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from tests.support import USER_A, FakeQueue, bearer
+from tests.support import USER_A, FakeQueue, FakeStorage, bearer
 
 A = bearer("token-a")
 PROFILE = {
@@ -160,3 +160,25 @@ def test_experiments_are_private_listed_and_deleted_with_the_account(
             return int(experiments), int(variants)
 
     assert asyncio.run(counts()) == (0, 0)
+
+
+def test_deleting_the_account_deletes_rendered_variant_files(
+    client: TestClient, storage: FakeStorage, factory: async_sessionmaker[AsyncSession]
+) -> None:
+    experiment_id = _create(client, factory)
+
+    async def render_variants() -> None:
+        async with factory() as session:
+            rows = (
+                await session.execute(select(Variant).where(Variant.experiment_id == experiment_id))
+            ).scalars()
+            for variant in rows:
+                variant.r2_key = f"variants/{variant.label}.mp4"
+                storage.objects[variant.r2_key] = b"rendered"
+            await session.commit()
+
+    asyncio.run(render_variants())
+    assert storage.objects
+
+    assert client.delete("/api/v1/me", headers=A).status_code == 204
+    assert storage.objects == {}

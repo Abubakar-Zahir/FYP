@@ -41,6 +41,35 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 
 PRs #2 to #14 are stacked: each one's base is the one before it. Review and merge them in order.
 
+## Phase 2 (weeks 7 to 10)
+
+Code written ahead of Gates 0 and 1. Nothing here is trained on real data yet. The hands-on work is in `docs/manual-work.md` section 4.
+
+| ID | Task | Owner | Status | Notes |
+|---|---|---|---|---|
+| P2-01 | Comment classifier: baselines, CPU model, XLM-R notebook | ML NLP | blocked | #16. Needs 2,000 to 3,000 labelled comments, then the Colab run |
+| P2-02 | Comment themes and next-video ideas | ML NLP | blocked | #17. NMF themes, LLM ideas, `comments.sync` job. Needs `COMMENT_MODEL_PATH` |
+| P2-03 | Hook scorer v1 (LightGBM, SHAP reasons, creator-split Spearman) | ML NLP | blocked | #18. Needs pilot reels with views, then `HOOK_SCORER_PATH` |
+| P2-04 | Auto-edit: word captions, silence cut, Roman Urdu, hook overlay | ML video | doing | #19. Needs real footage, CPU timing, Urdu speaker check |
+| P2-05 | Voice matching and DNA clusters | ML NLP | doing | #20. In-memory n-gram retrieval, not pgvector yet |
+| P2-06 | Gate 2 review | All | todo | |
+
+## Phase 3 (weeks 11 to 13)
+
+The hands-on work is in `docs/manual-work.md` section 5.
+
+| ID | Task | Owner | Status | Notes |
+|---|---|---|---|---|
+| P3-01 | Variant learner (Thompson sampling) and offline simulator | ML | done | #21. Simulator: TS close to epsilon-greedy, both far below random. Awaiting review |
+| P3-02 | Variant generation picked by the learner | Backend | done | #22. Awaiting review |
+| P3-03 | Trial Reel publishing with fallback, insights at 24 h and 72 h, winner | Backend | blocked | #23. Needs a real account run (P0-09) |
+| P3-04 | Account analytics and weekly report | Backend | done | #24. Awaiting review and a real week of data |
+| P3-05 | Rate limits, request ids, Sentry | Backend | done | #25. Awaiting review |
+| P3-06 | Web screens for Phases 2 and 3 on the real API | Frontend | done | #26. Not yet tried against the real API with a real video |
+| P3-07 | Pilot creators onboarded, Gate 3 timed run | All | todo | |
+
+PRs #16 to #26 are stacked on `main` in that order.
+
 Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 
 ## Decision log
@@ -64,7 +93,16 @@ Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 | 2026-11-16 | `reels` keeps the latest metrics only. Null means unavailable, not zero | Per-variant history comes with Phase 3 insights |
 | 2026-11-16 | Video libraries in an optional `video` dependency group, one worker for the `video` queue | Keeps the API image small and protects the CPU |
 | 2026-11-16 | Web sign-in is client-side only (`@supabase/supabase-js`), no `@supabase/ssr` | Every API call is made from the browser, and the API checks the token |
-| 2026-11-16 | Phase 2 and 3 screens show "arrives in Phase N" outside mock mode | They have no endpoints yet |
+| 2026-11-16 | Phase 2 and 3 screens show "arrives in Phase N" outside mock mode | They have no endpoints yet. Superseded the same day: #26 wires them to the real API |
+| 2026-11-16 | New dependencies: scikit-learn, lightgbm, sentry-sdk; onnxruntime and tokenizers in an optional `nlp` group | Approved by the team. Everything runs on CPU, no torch on the server |
+| 2026-11-16 | Main comment model: character n-gram TF-IDF with logistic regression. XLM-R trained on Colab, served with ONNX Runtime | Handles Roman Urdu spelling variety on CPU. XLM-R ships only if it beats it on the held-out split |
+| 2026-11-16 | NMF for comment themes instead of BERTopic | BERTopic needs torch and embeddings, too heavy for the CPU worker |
+| 2026-11-16 | Hook scorer evaluated with creator-split folds, Spearman and a bootstrap interval | A creator's reels must not be in both train and test. Correlation, not accuracy (SRS risks) |
+| 2026-11-16 | Voice retrieval with hashed n-gram vectors in memory, not pgvector yet | A creator has tens of captions, not thousands. Revisit if retrieval is slow or poor |
+| 2026-11-16 | Trial Reel fallback: after the first refusal, only the learner's top variant goes out as a normal reel | Followers should not see near-duplicates (FR-6.8) |
+| 2026-11-16 | Winner by views at 72 h. Learner success means views at or above the creator's median | Matches the per-account outlier target used everywhere else |
+| 2026-11-16 | Weekly report is rule-based, no LLM | Keeps cost at zero and the numbers traceable |
+| 2026-11-16 | Rate limits fail open when Redis is down | A broken counter must not lock every creator out. The failure is logged |
 
 ## Blockers
 
@@ -89,3 +127,4 @@ Add one line per working session: date, who, what was done, what is next.
 | 2026-10-21 | Frontend | Landing page at `/` for pilot recruitment (editorial glass style, no fake stats or testimonials) | Feedback from creators, link pilot form |
 | 2026-11-16 | Claude | Phase 0 and 1 code as 13 stacked PRs (#2 to #14): jobs, LLM wrapper, DNA structuring and extractor, Instagram connect and import, R2 upload, DNA and script endpoints, generated web types, Supabase sign-in, real screens. 249 Python, 22 web unit and 12 Playwright tests pass | Review and merge in order. Then the hands-on work: accounts, data, labels, Gate 0 |
 | 2026-11-16 | Backend | Ran the full stack locally: web and API checks, 110 pytest, 10 Playwright, docker-compose and migrations all pass | Run Instagram spike on a real account, LLM structuring step, Gate 0 |
+| 2026-11-16 | Claude | Phase 2 and 3 code as 11 stacked PRs (#16 to #26): comment models and themes, hook scorer, auto-edit, voice and clusters, variant learner and simulator, experiments, publishing and insights, weekly report, hardening, web screens. About 390 Python, 22 web unit and 13 Playwright tests pass. `docs/manual-work.md` lists the hands-on work for Phases 0 to 3 | Review in order. Gates 0 and 1 first, then the Phase 2 data and labels |

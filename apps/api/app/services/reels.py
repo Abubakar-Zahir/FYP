@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import ApiError
 from app.core.pagination import Page, decode_cursor, encode_cursor
 from app.models.dna import DnaRecordRow
+from app.models.experiment import Variant
 from app.models.reel import Comment, CommentTheme, Reel, ReelSource
 from app.models.script import Script
 from app.models.video import Video
@@ -117,10 +118,12 @@ async def delete_reel(session: AsyncSession, storage: Storage | None, reel: Reel
 
 
 async def stored_keys(session: AsyncSession, user_id: UUID) -> list[str]:
-    """Every file the user has in storage: reference reels and raw and edited videos."""
+    """Every file the user has in storage: reference reels, raw and edited videos, rendered variants."""
     reels = select(Reel.r2_key).where(Reel.user_id == user_id, Reel.r2_key.is_not(None))
+    variants = select(Variant.r2_key).where(Variant.user_id == user_id, Variant.r2_key.is_not(None))
     videos = select(Video.source_r2_key, Video.output_r2_key).where(Video.user_id == user_id)
     keys = [key for key in (await session.execute(reels)).scalars() if key]
+    keys += [key for key in (await session.execute(variants)).scalars() if key]
     for source, output in (await session.execute(videos)).all():
         keys += [key for key in (source, output) if key]
     return keys
