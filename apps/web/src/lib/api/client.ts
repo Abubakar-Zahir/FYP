@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/lib/auth/supabase";
+
 import type { ApiError } from "./types";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/v1`;
@@ -33,16 +35,24 @@ async function readError(response: Response): Promise<ApiRequestError> {
   return new ApiRequestError(response.status, "unknown_error", response.statusText);
 }
 
+const NO_CONTENT = 204;
+
+async function authHeader(): Promise<Record<string, string>> {
+  const token = await getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   await requestsReady;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: { "Content-Type": "application/json", ...(await authHeader()), ...init?.headers },
   });
   if (!response.ok) {
     throw await readError(response);
   }
-  return (await response.json()) as T;
+  // DELETE endpoints answer 204 with no body.
+  return (response.status === NO_CONTENT ? undefined : await response.json()) as T;
 }
 
 export function apiGet<T>(path: string): Promise<T> {

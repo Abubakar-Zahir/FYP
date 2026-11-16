@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 
 import { holdRequestsUntil } from "@/lib/api/client";
+import { USE_MOCKS } from "@/lib/config";
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
 const STALE_TIME_MS = 30_000;
 
 /*

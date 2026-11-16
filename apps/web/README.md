@@ -13,6 +13,25 @@ pnpm lint && pnpm typecheck && pnpm build
 
 Mocks are on unless `NEXT_PUBLIC_USE_MOCKS=false`. See `.env.example`.
 
+## Sign-in
+
+With mocks on, every sign-in button goes straight in. With `NEXT_PUBLIC_USE_MOCKS=false`, set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_API_BASE_URL` (for example `http://localhost:8000`).
+
+- Google and email sign-in use Supabase Auth with the PKCE flow. Supabase sends the browser back to `/auth/callback`, which swaps the code for a session.
+- In Supabase, add `http://localhost:3000/auth/callback` and your deployed `/auth/callback` to Authentication > URL Configuration > Redirect URLs, and turn on the Google provider.
+- Every API call sends `Authorization: Bearer <access token>`. The API checks it. The guard on app pages only sends signed-out visitors to `/login`.
+
+## API types
+
+Types come from the API (rules.md 4.5). After changing a Pydantic schema, from the repo root:
+
+```
+PYTHONPATH=apps/api:. uv run python apps/api/scripts/export_openapi.py apps/web/openapi.json
+pnpm --filter @fyp/web gen:api
+```
+
+CI fails if either file is out of date.
+
 ## How it is put together
 
 | Path | What |
@@ -20,7 +39,8 @@ Mocks are on unless `NEXT_PUBLIC_USE_MOCKS=false`. See `.env.example`.
 | `src/app/(auth)/login`, `src/app/(app)/*` | Routes. Pages are thin Server Components |
 | `src/components/<feature>/` | Feature components (dashboard, dna, studio, editor, variants, comments, reports) |
 | `src/components/ui/` | Shared primitives: glass card, button, badge, form fields, loading/empty/error states, job progress |
-| `src/lib/api/` | `types.ts` (planned API shapes), `client.ts` (one typed fetch client), `hooks.ts` (one TanStack Query hook per resource) |
+| `src/lib/api/` | `schema.d.ts` (generated from `openapi.json`, never edit), `types.ts` (aliases of it), `planned-types.ts` (screens with no endpoint yet), `client.ts` (one fetch client, adds the sign-in token), `hooks.ts` (one TanStack Query hook per resource) |
+| `src/lib/auth/` | Supabase Auth in the browser |
 | `src/lib/mocks/` | MSW handlers and realistic fixtures (Roman Urdu comments, mixed captions) |
 | `src/app/globals.css` | Design tokens (`@theme`) and the `glass` / `glass-inset` utilities |
 
