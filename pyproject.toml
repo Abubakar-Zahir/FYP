@@ -56,6 +56,7 @@ select = ["E", "F", "I", "B", "UP", "S", "T20"]
 "spikes/**" = ["T20", "S603", "S607"]
 # Command-line entry points that report results to the person running them.
 "ml/**/train.py" = ["T20"]
+"ml/**/report.py" = ["T20"]
 "apps/api/scripts/**" = ["T20"]
 "notebooks/**" = ["T20", "E402"]
 
