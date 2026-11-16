@@ -4,11 +4,15 @@ import type {
   ApiError,
   EditResult,
   Experiment,
+  DnaRecord,
   GenerateScriptRequest,
+  InstagramConnected,
   Job,
   Me,
   Page,
   Profile,
+  ReferenceUpload,
+  ReferenceUploadRequest,
   Script,
 } from "@/lib/api/types";
 
@@ -32,6 +36,8 @@ const NETWORK_DELAY_MS = 450;
 const SLOW_DELAY_MS = 4000;
 
 const JOB_DURATION_MS = {
+  instagramImport: 2500,
+  dnaAnalyse: 3000,
   script: 3500,
   edit: 6000,
   publish: 5000,
@@ -48,6 +54,7 @@ type MockJob = {
 
 const jobs = new Map<string, MockJob>();
 const scripts = new Map<string, Script>();
+const uploads = new Map<string, string>();
 let me: Me = structuredClone(meFixture);
 let experiment: Experiment = structuredClone(experimentFixture);
 const dnaRecords = structuredClone(dnaFixture);
@@ -118,9 +125,82 @@ export const handlers = [
     return respond(me);
   }),
 
-  http.get(`${API}/instagram/connect`, () => {
+  // Real Instagram is another site. The mock "approves" at once and sends the browser to the callback page.
+  http.get(`${API}/instagram/connect`, () =>
+    respond({ authorize_url: "/connect/instagram?code=mock-code&state=mock-state" }),
+  ),
+
+  http.post(`${API}/instagram/callback`, async () => {
     me = { ...me, instagram: connectedInstagram };
-    return respond(me);
+    const id = nextId("job");
+    jobs.set(id, {
+      type: "instagram.import",
+      startedAt: Date.now(),
+      durationMs: JOB_DURATION_MS.instagramImport,
+      result: { reels: reelsFixture.length, comments: 48 },
+    });
+    const body: InstagramConnected = { job_id: id, instagram: connectedInstagram };
+    return respond(body, { status: 202 });
+  }),
+
+  http.delete(`${API}/instagram/account`, async () => {
+    await networkDelay();
+    me = { ...me, instagram: null };
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.delete(`${API}/me`, async () => {
+    await networkDelay();
+    me = structuredClone(meFixture);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post(`${API}/reels/reference`, async ({ request }) => {
+    const input = (await request.json()) as ReferenceUploadRequest;
+    const reelId = nextId("reel");
+    uploads.set(reelId, input.filename.replace(/\.[^.]+$/, ""));
+    const body: ReferenceUpload = {
+      reel: {
+        id: reelId,
+        source: "reference",
+        title: uploads.get(reelId) ?? "Reference reel",
+        caption: null,
+        permalink: null,
+        posted_at: null,
+        views: null,
+        reach: null,
+        saves: null,
+        shares: null,
+        avg_watch_time_s: null,
+        outlier_score: null,
+        hook_type: null,
+      },
+      upload_url: `/mock-uploads/${reelId}`,
+      upload_headers: { "Content-Type": input.content_type },
+    };
+    return respond(body, { status: 201 });
+  }),
+
+  // Stands in for the presigned PUT straight to R2.
+  http.put("*/mock-uploads/:id", async () => {
+    await networkDelay();
+    return new HttpResponse(null, { status: 200 });
+  }),
+
+  http.post(`${API}/dna/analyse`, async ({ request }) => {
+    const { reel_id: reelId } = (await request.json()) as { reel_id: string };
+    const record: DnaRecord = {
+      ...structuredClone(dnaRecords[0]),
+      id: nextId("dna"),
+      reel_id: reelId,
+      title: uploads.get(reelId) ?? "Reference reel",
+      source: "reference",
+      outlier_score: null,
+      is_template: false,
+    };
+    return startJob("dna.analyse", JOB_DURATION_MS.dnaAnalyse, { dna_id: record.id }, () => {
+      dnaRecords.unshift(record);
+    });
   }),
 
   http.get(`${API}/reels`, () => respond(pageOf(reelsFixture))),
