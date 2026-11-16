@@ -147,3 +147,13 @@ Keyframes are not kept yet, because nothing reads them until OCR or a vision mod
 The worker builds the prompt from the template's structure, the creator's niche, tone and goals, and their latest captions as voice examples (`ml/scripts/generate.py`). It asks for 5 hooks, 3 angles and a full script, retries once on a bad answer, and stores the prompt and model version with the output.
 
 `GET /api/v1/scripts/{id}` returns the script, or `409 script_not_ready` while the job runs. Hooks carry `score: null` until the hook scorer ships in Phase 2.
+
+## Comment intelligence
+
+`POST /api/v1/comments/sync` starts `comments.sync` on the `ai` queue:
+
+1. Labels every comment without a label, using the model at `COMMENT_MODEL_PATH`. That is a `.joblib` file from `ml.comments.train`, or the XLM-R ONNX folder from the notebook, which needs the `nlp` group on the worker. Each label stores the model that made it.
+2. Groups the last 90 days of labelled, non-spam comments into up to 8 themes (`ml/comments/themes.py`).
+3. Asks the LLM for a short name and a next-video idea per theme. Without an LLM, or if its answer is unreadable, it uses a plain fallback built from the comments themselves.
+
+`GET /api/v1/comments/summary` counts labelled comments by label over 30 days. `GET /api/v1/comments/themes` returns the themes, largest first. Disconnecting Instagram deletes the themes along with the comments.

@@ -5,6 +5,7 @@ import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.comments import router as comments_router
 from app.api.v1.dna import router as dna_router
 from app.api.v1.health import router as health_router
 from app.api.v1.instagram import router as instagram_router
@@ -61,6 +62,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(reels_router, prefix=API_PREFIX)
     application.include_router(dna_router, prefix=API_PREFIX)
     application.include_router(scripts_router, prefix=API_PREFIX)
+    application.include_router(comments_router, prefix=API_PREFIX)
     return application
 
 

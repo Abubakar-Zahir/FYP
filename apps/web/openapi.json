@@ -65,6 +65,87 @@
         "title": "Beat",
         "type": "object"
       },
+      "CommentLabel": {
+        "description": "The 6 classes from docs/label-guideline.md and FR-7.2.",
+        "enum": [
+          "question",
+          "request",
+          "praise",
+          "objection",
+          "complaint",
+          "spam"
+        ],
+        "title": "CommentLabel",
+        "type": "string"
+      },
+      "CommentSummaryOut": {
+        "description": "Labelled comments in the period. Comments not yet classified are not counted.",
+        "properties": {
+          "by_label": {
+            "items": {
+              "$ref": "#/components/schemas/LabelCount"
+            },
+            "title": "By Label",
+            "type": "array"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "period_days",
+          "by_label"
+        ],
+        "title": "CommentSummaryOut",
+        "type": "object"
+      },
+      "CommentThemeOut": {
+        "properties": {
+          "dominant_label": {
+            "$ref": "#/components/schemas/CommentLabel"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "idea": {
+            "title": "Idea",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "theme",
+          "size",
+          "dominant_label",
+          "examples",
+          "idea"
+        ],
+        "title": "CommentThemeOut",
+        "type": "object"
+      },
       "DnaRecordOut": {
         "description": "What the DNA library and detail screens show. Field names match apps/web.",
         "properties": {
@@ -400,6 +481,23 @@
         "title": "JobStatus",
         "type": "string"
       },
+      "LabelCount": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label": {
+            "$ref": "#/components/schemas/CommentLabel"
+          }
+        },
+        "required": [
+          "label",
+          "count"
+        ],
+        "title": "LabelCount",
+        "type": "object"
+      },
       "Language": {
         "enum": [
           "english",
@@ -486,6 +584,34 @@
           "text"
         ],
         "title": "Overlay",
+        "type": "object"
+      },
+      "Page_CommentThemeOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CommentThemeOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[CommentThemeOut]",
         "type": "object"
       },
       "Page_DnaRecordOut_": {
@@ -1007,6 +1133,85 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/comments/summary": {
+      "get": {
+        "operationId": "read_summary_api_v1_comments_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Summary",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/comments/sync": {
+      "post": {
+        "description": "Classifies new comments and rebuilds themes. Run an Instagram import first to fetch new comments.",
+        "operationId": "sync_comments_api_v1_comments_sync_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Sync Comments",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/comments/themes": {
+      "get": {
+        "operationId": "read_themes_api_v1_comments_themes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CommentThemeOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Themes",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
     "/api/v1/dna": {
       "get": {
         "operationId": "list_dna_api_v1_dna_get",

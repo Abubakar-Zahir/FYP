@@ -17,6 +17,7 @@ class TaskName(StrEnum):
     INSTAGRAM_REFRESH_TOKENS = "instagram.refresh_tokens"
     DNA_ANALYSE = "dna.analyse"
     SCRIPTS_GENERATE = "scripts.generate"
+    COMMENTS_SYNC = "comments.sync"
 
 
 TASK_QUEUES: dict[TaskName, Queue] = {
@@ -24,4 +25,5 @@ TASK_QUEUES: dict[TaskName, Queue] = {
     TaskName.INSTAGRAM_REFRESH_TOKENS: Queue.DEFAULT,
     TaskName.DNA_ANALYSE: Queue.VIDEO,
     TaskName.SCRIPTS_GENERATE: Queue.AI,
+    TaskName.COMMENTS_SYNC: Queue.AI,
 }

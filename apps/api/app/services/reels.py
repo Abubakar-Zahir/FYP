@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import ApiError
 from app.core.pagination import Page, decode_cursor, encode_cursor
 from app.models.dna import DnaRecordRow
-from app.models.reel import Comment, Reel, ReelSource
+from app.models.reel import Comment, CommentTheme, Reel, ReelSource
 from app.models.script import Script
 from app.schemas.reels import ReelOut
 from app.schemas.uploads import EXTENSIONS, ReferenceUpload, ReferenceUploadRequest
@@ -61,6 +61,8 @@ def as_utc(value: datetime) -> datetime:
 async def delete_own_reels(session: AsyncSession, user_id: UUID) -> None:
     """Imported reels and their comments. Reference uploads belong to the user, not the account."""
     own = select(Reel.id).where(Reel.user_id == user_id, Reel.source == ReelSource.OWN)
+    # Themes are built from those comments, so they go too.
+    await session.execute(delete(CommentTheme).where(CommentTheme.user_id == user_id))
     await session.execute(delete(Comment).where(Comment.reel_id.in_(own)))
     own_dna = select(DnaRecordRow.id).where(DnaRecordRow.reel_id.in_(own))
     await session.execute(delete(Script).where(Script.template_id.in_(own_dna)))
