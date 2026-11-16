@@ -29,10 +29,18 @@ This shows the pipeline runs. It says nothing about accuracy on real reels or on
 2. **Some real cuts can be missed.** Our first test video changed only hue between scenes, and the default threshold of 27 found 0 of its 2 cuts. Compare the detected cuts with a few reels by eye and tune `--threshold`.
 3. **"Roman Urdu" is a writing system, not a way of speaking.** Whisper with `language=ur` writes Urdu script, so a Roman Urdu reference will score near 100% WER without meaning anything. Measure Urdu speech against Urdu-script references first. Roman Urdu captions then need a transliteration step, and that step should be scored separately.
 
+## Structuring into a DnaRecord
+
+`structure.py` sends each `ReelSignals` file to the configured LLM and writes a `<reel>.dna.json` `DnaRecord` next to it: hook type, hook text, beats and CTA. The logic is in `ml/dna/structure.py`, so the worker uses the same code.
+
+- The prompt defines the 6 hook types with Roman Urdu examples. Keep them in step with the reel hook labelling guide.
+- A bad answer (not JSON, unknown hook type, overlapping beats, beats past the end) is retried once with the problem named. A second bad answer fails that reel instead of saving half a record.
+- Every call goes through the budget guard in `apps/api/app/services/llm.py`. The run prints the total cost.
+
 ## Not covered yet
 
-- **Hook type, beats and CTA.** These need the LLM structuring step into `DnaRecord`, which waits on the LLM provider decision (`progress.md`, open question 2). Gate 0 asks for a DNA record, so this must be added or the gate adjusted.
-- **On-screen text.** Keyframes are saved for OCR or a vision LLM, and neither is wired up.
+- **On-screen text.** Keyframes are saved for OCR or a vision LLM, and neither is wired up. `overlays` stays empty until one is, and the LLM is never asked to guess it.
+- **Hook type accuracy.** Only possible once the 100 reels from P1-07 are labelled by a person.
 
 ## Run it
 
@@ -41,6 +49,7 @@ Run from the repo root. Put reels under `data/`, which git ignores. Never commit
 ```
 PYTHONPATH=. uv run spikes/dna/extract.py data/reels --model small
 PYTHONPATH=. uv run spikes/dna/whisper_wer.py data/wer/manifest.csv --model small
+PYTHONPATH=.:apps/api uv run python spikes/dna/structure.py data/dna_spike   # paid LLM calls, needs LLM_* in .env
 ```
 
 Paths in the manifest are relative to the manifest. Use 10 or more clips per group, with references typed by a person who didn't see Whisper's output:
