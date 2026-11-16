@@ -37,11 +37,11 @@ class Settings(BaseSettings):
     r2_secret_key: SecretStr | None = None
     r2_bucket: str | None = None
 
-    # Whisper size for the DNA worker. P0-11 compares tiny and small on Urdu.
     # A .joblib file from ml.comments.train, or a folder from the XLM-R notebook (nlp group).
     comment_model_path: str | None = None
     # A folder saved by ml.scoring.train. Without it, hooks stay unscored.
     hook_scorer_path: str | None = None
+    # Whisper size for the DNA and edit workers. P0-11 compares tiny and small on Urdu.
     whisper_model: str = "small"
     ffmpeg_path: str = "ffmpeg"
     # MANUAL: the creator shares the winner in the app. SS_PERFORMANCE: Instagram decides.
