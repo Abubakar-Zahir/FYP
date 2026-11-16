@@ -1,14 +1,46 @@
 "use client";
 
-import { Film } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Dna, Film, LoaderCircle } from "lucide-react";
+import { useEffect } from "react";
 
-import { useReels } from "@/lib/api/hooks";
+import { queryKeys, useAnalyseReel, useJob, useReels } from "@/lib/api/hooks";
+import type { Reel } from "@/lib/api/types";
 import { formatCompact, formatOutlier, formatSeconds, formatShortDate } from "@/lib/utils";
 import { HOOK_TYPE_LABEL, outlierTone } from "@/lib/utils/labels";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { CardHeader, GlassCard } from "@/components/ui/card";
 import { EmptyState, LoadingBlock, QueryState } from "@/components/ui/states";
+
+/** A reel without a hook type has no DNA record yet. Analysing it runs the DNA job on the video. */
+function HookCell({ reel }: { reel: Reel }) {
+  const queryClient = useQueryClient();
+  const analyse = useAnalyseReel();
+  const job = useJob(analyse.data?.job_id ?? null);
+  const status = job.data?.status;
+
+  useEffect(() => {
+    if (status === "done") void queryClient.invalidateQueries({ queryKey: queryKeys.reels });
+  }, [status, queryClient]);
+
+  if (reel.hook_type) return <>{HOOK_TYPE_LABEL[reel.hook_type]}</>;
+  if (status === "failed" || analyse.isError) return <span className="text-danger">Failed</span>;
+  if (analyse.data || analyse.isPending) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-subtle">
+        <LoaderCircle aria-hidden className="size-3.5 animate-spin" />
+        Analysing
+      </span>
+    );
+  }
+  return (
+    <Button variant="ghost" size="sm" onClick={() => analyse.mutate(reel.id)}>
+      <Dna aria-hidden />
+      Analyse
+    </Button>
+  );
+}
 
 export function RecentReels() {
   const reels = useReels();
@@ -50,7 +82,7 @@ export function RecentReels() {
                       <p dir="auto" className="truncate font-medium">{reel.caption ?? reel.title}</p>
                       <p className="text-xs text-subtle">{formatShortDate(reel.posted_at)}</p>
                     </td>
-                    <td className="px-2 py-3 text-muted">{reel.hook_type ? HOOK_TYPE_LABEL[reel.hook_type] : "—"}</td>
+                    <td className="px-2 py-3 text-muted"><HookCell reel={reel} /></td>
                     <td className="px-2 py-3 text-right tabular-nums">{formatCompact(reel.views)}</td>
                     <td className="px-2 py-3 text-right tabular-nums">{formatCompact(reel.saves)}</td>
                     <td className="px-2 py-3 text-right tabular-nums">{formatCompact(reel.shares)}</td>

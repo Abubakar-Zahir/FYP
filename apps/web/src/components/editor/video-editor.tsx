@@ -1,36 +1,39 @@
 "use client";
 
 import { ArrowRight, CircleCheck, Film, RotateCcw, Scissors, Upload, WandSparkles } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-import { useJob, useStartEdit } from "@/lib/api/hooks";
+import { useCreateExperiment, useJob, useStartEdit } from "@/lib/api/hooks";
 import type { EditOptions, EditResult } from "@/lib/api/types";
 import { cn, formatSeconds } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { CardHeader, GlassCard, InsetTile } from "@/components/ui/card";
-import { Switch } from "@/components/ui/form";
+import { Field, Input, Switch } from "@/components/ui/form";
 import { JobProgress } from "@/components/ui/job-progress";
 import { ErrorState } from "@/components/ui/states";
 
 import { CAPTION_STYLES } from "./caption-styles";
 import { PhonePreview } from "./phone-preview";
-import { MAX_DURATION_S, useMockUpload, type UploadState } from "./use-mock-upload";
+import { MAX_DURATION_S, useVideoUpload, type UploadState } from "./use-video-upload";
 
-const MOCK_VIDEO_ID = "vid_01";
 const SAMPLE_HOOK = "Sab se crispy chaat?";
+const VARIANTS_TO_TEST = 3;
 
 const DEFAULT_OPTIONS: EditOptions = {
   caption_style: "bold_pop",
   cut_silences: true,
   progress_bar: true,
   hook_overlay: true,
+  hook_text: SAMPLE_HOOK,
+  roman_urdu_captions: true,
 };
 
 function UploadStep({ state, onFile, onSample, onReset }: {
   state: UploadState;
   onFile: (file: File) => void;
-  onSample: () => void;
+  onSample?: () => void;
   onReset: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -107,9 +110,11 @@ function UploadStep({ state, onFile, onSample, onReset }: {
         }}
       />
       {state.status === "invalid" && <p role="alert" className="mt-2 text-sm text-danger">{state.message}</p>}
-      <Button variant="ghost" size="sm" className="mt-3" onClick={onSample}>
-        No clip handy? Use a sample
-      </Button>
+      {onSample && (
+        <Button variant="ghost" size="sm" className="mt-3" onClick={onSample}>
+          No clip handy? Use a sample
+        </Button>
+      )}
     </div>
   );
 }
@@ -140,7 +145,35 @@ function CaptionStylePicker({ value, onChange }: { value: EditOptions["caption_s
   );
 }
 
-function RenderStatus({ jobId, onRetry }: { jobId: string; onRetry: () => void }) {
+type CreateResult = { experiment_id: string };
+
+/** Starts the experiment, waits for the variants, then opens them. */
+function CreateVariants({ videoId }: { videoId: string }) {
+  const router = useRouter();
+  const create = useCreateExperiment();
+  const job = useJob<CreateResult>(create.data?.job_id ?? null);
+  const experimentId = job.data?.status === "done" ? (job.data.result?.experiment_id ?? null) : null;
+  const start = () => create.mutate({ video_id: videoId, script_id: null, variant_count: VARIANTS_TO_TEST });
+
+  useEffect(() => {
+    if (experimentId) router.push("/variants?experiment=" + experimentId);
+  }, [experimentId, router]);
+
+  if (create.data) {
+    return <JobProgress label="Writing variants and picking which to test" job={job.data} requestError={job.error} onRetry={start} />;
+  }
+  return (
+    <>
+      <Button className="w-full" onClick={start} disabled={create.isPending}>
+        Create {VARIANTS_TO_TEST} variants
+        <ArrowRight aria-hidden />
+      </Button>
+      {create.isError && <p role="alert" className="text-sm text-danger">{create.error.message}</p>}
+    </>
+  );
+}
+
+function RenderStatus({ jobId, videoId, onRetry }: { jobId: string; videoId: string; onRetry: () => void }) {
   const job = useJob<EditResult>(jobId);
   const result = job.data?.status === "done" ? job.data.result : null;
 
@@ -160,20 +193,23 @@ function RenderStatus({ jobId, onRetry }: { jobId: string; onRetry: () => void }
           {result.removed_silence_s}s silence cut
         </Badge>
       </div>
-      <ButtonLink href="/variants" className="w-full">
-        Create 3 variants
-        <ArrowRight aria-hidden />
-      </ButtonLink>
+      {result.output_url && !result.output_url.startsWith("mock://") && (
+        <ButtonLink href={result.output_url} variant="secondary" className="w-full" target="_blank" rel="noreferrer">
+          Watch the edit
+        </ButtonLink>
+      )}
+      <CreateVariants videoId={videoId} />
     </InsetTile>
   );
 }
 
 export function VideoEditor() {
-  const upload = useMockUpload();
+  const upload = useVideoUpload();
   const [options, setOptions] = useState<EditOptions>(DEFAULT_OPTIONS);
-  const startEdit = useStartEdit(MOCK_VIDEO_ID);
+  const startEdit = useStartEdit();
 
   const uploaded = upload.state.status === "uploaded";
+  const videoId = upload.state.status === "uploaded" ? upload.state.videoId : null;
   const previewUrl = upload.state.status === "uploading" || upload.state.status === "uploaded" ? upload.state.previewUrl : null;
   const jobId = startEdit.data?.job_id ?? null;
 
@@ -181,14 +217,21 @@ export function VideoEditor() {
     setOptions((current) => ({ ...current, [key]: value }));
   }
 
-  const render = () => startEdit.mutate(options);
+  const render = () => {
+    if (videoId) startEdit.mutate({ videoId, options });
+  };
 
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[1fr_20rem]">
       <div className="space-y-4">
         <GlassCard>
           <CardHeader title="1. Upload footage" />
-          <UploadStep state={upload.state} onFile={(file) => void upload.uploadFile(file)} onSample={upload.loadSampleClip} onReset={upload.reset} />
+          <UploadStep
+            state={upload.state}
+            onFile={(file) => void upload.uploadFile(file)}
+            onSample={upload.loadSampleClip}
+            onReset={upload.reset}
+          />
         </GlassCard>
 
         <GlassCard className={cn(!uploaded && "opacity-60")} aria-disabled={!uploaded}>
@@ -198,6 +241,13 @@ export function VideoEditor() {
             <div className="divide-y divide-edge">
               <Switch label="Cut silences" description="Removes pauses longer than 0.6 s" checked={options.cut_silences} onChange={(event) => setOption("cut_silences", event.target.checked)} />
               <Switch label="Hook text overlay" description="Shows your hook line for the first 3 s" checked={options.hook_overlay} onChange={(event) => setOption("hook_overlay", event.target.checked)} />
+              {options.hook_overlay && (
+                <div className="py-3">
+                  <Field label="Hook line" htmlFor="hook-text">
+                    <Input id="hook-text" dir="auto" maxLength={120} value={options.hook_text ?? ""} onChange={(event) => setOption("hook_text", event.target.value)} />
+                  </Field>
+                </div>
+              )}
               <Switch label="Progress bar" description="Thin bar along the bottom edge" checked={options.progress_bar} onChange={(event) => setOption("progress_bar", event.target.checked)} />
             </div>
             <Button size="lg" className="w-full sm:w-auto" onClick={render} disabled={!uploaded || startEdit.isPending}>
@@ -210,9 +260,9 @@ export function VideoEditor() {
 
       <GlassCard className="space-y-4 lg:sticky lg:top-6">
         <CardHeader title="Preview" className="mb-0" />
-        <PhonePreview options={options} videoUrl={previewUrl} hookText={SAMPLE_HOOK} />
+        <PhonePreview options={options} videoUrl={previewUrl} hookText={options.hook_text || SAMPLE_HOOK} />
         {startEdit.isError && <ErrorState error={startEdit.error} onRetry={render} />}
-        {jobId && <RenderStatus key={jobId} jobId={jobId} onRetry={render} />}
+        {jobId && videoId && <RenderStatus key={jobId} jobId={jobId} videoId={videoId} onRetry={render} />}
       </GlassCard>
     </div>
   );

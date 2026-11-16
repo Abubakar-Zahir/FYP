@@ -14,6 +14,7 @@ import type {
   ReferenceUpload,
   ReferenceUploadRequest,
   Script,
+  VideoUpload,
 } from "@/lib/api/types";
 
 import {
@@ -42,6 +43,8 @@ const JOB_DURATION_MS = {
   edit: 6000,
   publish: 5000,
   commentSync: 3000,
+  experiment: 4000,
+  report: 3000,
 } as const;
 
 type MockJob = {
@@ -245,9 +248,28 @@ export const handlers = [
     return respond(script);
   }),
 
+  http.post(`${API}/videos/upload-url`, async ({ request }) => {
+    const input = (await request.json()) as { filename: string; content_type: string };
+    const videoId = nextId("vid");
+    const body: VideoUpload = {
+      video: { id: videoId, title: input.filename.replace(/\.[^.]+$/, ""), output_url: null, duration_s: null, removed_silence_s: null },
+      upload_url: `/mock-uploads/${videoId}`,
+      upload_headers: { "Content-Type": input.content_type },
+    };
+    return respond(body, { status: 201 });
+  }),
+
   http.post(`${API}/videos/:id/edit`, () => {
     const result: EditResult = { output_url: "mock://edited.mp4", duration_s: 27, removed_silence_s: 6.4 };
     return startJob("videos.edit", JOB_DURATION_MS.edit, result);
+  }),
+
+  http.get(`${API}/experiments`, () => respond(pageOf([experiment]))),
+
+  // A fresh draft experiment, so the variants screen shows the publish step again.
+  http.post(`${API}/experiments`, () => {
+    experiment = structuredClone(experimentFixture);
+    return startJob("experiments.create", JOB_DURATION_MS.experiment, { experiment_id: experiment.id });
   }),
 
   http.get(`${API}/experiments/:id`, () => respond(experiment)),
@@ -275,6 +297,8 @@ export const handlers = [
     const empty = readMockScenario() === "empty";
     return respond(empty ? { ...weeklyReportFixture, wins: [], losses: [], themes: [], ideas: [] } : weeklyReportFixture);
   }),
+
+  http.post(`${API}/reports/weekly`, () => startJob("reports.weekly", JOB_DURATION_MS.report, { report_id: "rep_mock" })),
 
   http.get(`${API}/jobs/:id`, ({ params }) => {
     const id = String(params.id);

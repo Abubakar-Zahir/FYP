@@ -54,6 +54,20 @@ test("publishing variants picks a winner with insights", async ({ page }) => {
   await expect(page.getByRole("table")).toContainText("15.9K");
 });
 
+test("a rendered edit becomes a variant experiment", async ({ page }) => {
+  await page.goto("/editor");
+
+  await page.getByRole("button", { name: "No clip handy? Use a sample" }).click();
+  await page.getByRole("textbox", { name: "Hook line" }).fill("Lahore ki sab se crispy chaat?");
+  await page.getByRole("button", { name: "Render", exact: true }).click();
+  await expect(page.getByText("Render ready")).toBeVisible({ timeout: 20_000 });
+
+  await page.getByRole("button", { name: "Create 3 variants" }).click();
+
+  await expect(page).toHaveURL(/\/variants\?experiment=/, { timeout: 20_000 });
+  await expect(page.getByRole("button", { name: "Publish as Trial Reels" })).toBeVisible();
+});
+
 test("comments page shows ranked themes in Roman Urdu", async ({ page }) => {
   await page.goto("/comments");
 

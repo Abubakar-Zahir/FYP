@@ -9,6 +9,7 @@ import type {
   CommentTheme,
   DnaRecord,
   EditOptions,
+  CreateExperimentRequest,
   Experiment,
   GenerateScriptRequest,
   InstagramAuthorizeUrl,
@@ -37,6 +38,7 @@ export const queryKeys = {
   script: (id: string) => ["scripts", id] as const,
   job: (id: string) => ["jobs", id] as const,
   experiment: (id: string) => ["experiments", id] as const,
+  experiments: ["experiments"] as const,
   commentThemes: ["comments", "themes"] as const,
   commentSummary: ["comments", "summary"] as const,
   weeklyReport: ["reports", "weekly"] as const,
@@ -163,8 +165,30 @@ export function useGenerateScript() {
   return useStartJob<GenerateScriptRequest>("/scripts/generate");
 }
 
-export function useStartEdit(videoId: string) {
-  return useStartJob<EditOptions>(`/videos/${videoId}/edit`);
+/** The video id comes from the upload, so it is passed when the edit starts. */
+export function useStartEdit() {
+  return useMutation({
+    mutationFn: ({ videoId, options }: { videoId: string; options: EditOptions }) =>
+      apiSend<JobAccepted>("POST", `/videos/${videoId}/edit`, options),
+  });
+}
+
+export function useCreateExperiment() {
+  return useStartJob<CreateExperimentRequest>("/experiments");
+}
+
+export function useExperiments() {
+  return useQuery({ queryKey: queryKeys.experiments, queryFn: () => apiGet<Page<Experiment>>("/experiments?limit=10") });
+}
+
+export function useAnalyseReel() {
+  return useMutation({
+    mutationFn: (reelId: string) => apiSend<JobAccepted>("POST", "/dna/analyse", { reel_id: reelId }),
+  });
+}
+
+export function useBuildWeeklyReport() {
+  return useStartJob<void>("/reports/weekly");
 }
 
 export function useScript(id: string | null) {
@@ -175,8 +199,12 @@ export function useScript(id: string | null) {
   });
 }
 
-export function useExperiment(id: string) {
-  return useQuery({ queryKey: queryKeys.experiment(id), queryFn: () => apiGet<Experiment>(`/experiments/${id}`) });
+export function useExperiment(id: string | null) {
+  return useQuery({
+    queryKey: queryKeys.experiment(id ?? "none"),
+    queryFn: () => apiGet<Experiment>(`/experiments/${id}`),
+    enabled: id !== null,
+  });
 }
 
 export function usePublishExperiment(id: string) {
