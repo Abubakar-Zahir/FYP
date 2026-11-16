@@ -49,4 +49,29 @@ export type ScriptBeat = Schemas["ScriptBeat"];
 export type Script = Schemas["ScriptOut"];
 export type GenerateScriptRequest = Schemas["GenerateScriptRequest"];
 
-export type * from "./planned-types";
+export type DnaCluster = Schemas["DnaClusterOut"];
+export type HookScoreRequest = Schemas["HookScoreRequest"];
+
+export type TrendPoint = Schemas["TrendPoint"];
+export type FormatPerformance = Schemas["FormatPerformance"];
+export type AnalyticsOverview = Schemas["AnalyticsOverview"];
+
+export type CaptionStyle = Schemas["CaptionStyle"];
+export type EditOptions = Schemas["EditRequest"];
+/** A videos.edit job's `result` (apps/api/app/schemas/videos.py EditResult). Job results aren't in OpenAPI. */
+export type EditResult = { output_url: string; duration_s: number; removed_silence_s: number };
+export type Video = Schemas["VideoOut"];
+export type VideoUpload = Schemas["VideoUpload"];
+
+export type VariantStatus = Schemas["VariantStatus"];
+export type VariantInsight = Schemas["VariantInsightOut"];
+export type Variant = Schemas["VariantOut"];
+export type Experiment = Schemas["ExperimentOut"];
+export type ExperimentStatus = Schemas["ExperimentStatus"];
+export type CreateExperimentRequest = Schemas["CreateExperimentRequest"];
+
+export type CommentLabel = Schemas["CommentLabel"];
+export type CommentTheme = Schemas["CommentThemeOut"];
+export type CommentSummary = Schemas["CommentSummaryOut"];
+
+export type WeeklyReport = Schemas["WeeklyReportContent"];

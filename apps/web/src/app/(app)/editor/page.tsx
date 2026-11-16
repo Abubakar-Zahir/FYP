@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { VideoEditor } from "@/components/editor/video-editor";
 import { PageHeader } from "@/components/ui/page-header";
-import { PlannedFeature } from "@/components/ui/planned-feature";
 
 export const metadata: Metadata = { title: "Editor · Reelmind" };
 
@@ -14,9 +13,7 @@ export default function EditorPage() {
         title="Editor"
         description="Upload raw vertical footage. We add word-level captions, cut silences and render a preview."
       />
-      <PlannedFeature phase="Phase 2" title="Auto-edit">
         <VideoEditor />
-      </PlannedFeature>
     </>
   );
 }

@@ -2,9 +2,18 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Brain, FlaskConical, Info, Rocket, Send, Trophy } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-import { queryKeys, useExperiment, useJob, useMe, usePublishExperiment, useShareWinner } from "@/lib/api/hooks";
+import {
+  queryKeys,
+  useExperiment,
+  useExperiments,
+  useJob,
+  useMe,
+  usePublishExperiment,
+  useShareWinner,
+} from "@/lib/api/hooks";
 import type { Experiment } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { CardHeader, GlassCard } from "@/components/ui/card";
@@ -14,17 +23,16 @@ import { EmptyState, LoadingBlock, QueryState } from "@/components/ui/states";
 import { InsightsTable } from "./insights-table";
 import { VariantCard } from "./variant-card";
 
-const MOCK_EXPERIMENT_ID = "exp_01";
-
 function EligibilityNotice() {
   const me = useMe();
-  if (!me.data?.instagram || me.data.instagram.trial_reels_eligible) return null;
+  // Null means not known yet: the first publish finds out.
+  if (me.data?.instagram?.trial_reels_eligible !== false) return null;
   return (
     <div className="glass-inset mb-4 flex gap-3 border-warning/40 p-4 text-sm">
       <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-warning" />
       <p className="text-muted">
-        Your account can&apos;t post Trial Reels yet. Variants will go out as normal reels, spaced across days, and still
-        feed the learner (FR-6.8).
+        Instagram didn&apos;t accept Trial Reels from your account. Only the learner&apos;s top variant goes out, as a
+        normal reel, so your followers don&apos;t see near-duplicates (FR-6.8).
       </p>
     </div>
   );
@@ -124,21 +132,41 @@ function ExperimentView({ experiment }: { experiment: Experiment }) {
   );
 }
 
-export function VariantExperiment() {
-  const experiment = useExperiment(MOCK_EXPERIMENT_ID);
+const NO_VARIANTS = (
+  <GlassCard>
+    <EmptyState icon={FlaskConical} title="No variants yet" description="Render a video in the editor, then create 3 to 5 variants from it." />
+  </GlassCard>
+);
+
+function ExperimentById({ id }: { id: string }) {
+  const experiment = useExperiment(id);
 
   return (
     <QueryState
       query={experiment}
       loading={<GlassCard><LoadingBlock label="Loading experiment" /></GlassCard>}
       isEmpty={(data) => data.variants.length === 0}
-      empty={
-        <GlassCard>
-          <EmptyState icon={FlaskConical} title="No variants yet" description="Render a video in the editor, then create 3 to 5 variants from it." />
-        </GlassCard>
-      }
+      empty={NO_VARIANTS}
     >
       {(data) => <ExperimentView experiment={data} />}
+    </QueryState>
+  );
+}
+
+/** The experiment named in ?experiment=, or else the newest one. */
+export function VariantExperiment() {
+  const requested = useSearchParams().get("experiment");
+  const recent = useExperiments();
+
+  if (requested) return <ExperimentById id={requested} />;
+  return (
+    <QueryState
+      query={recent}
+      loading={<GlassCard><LoadingBlock label="Loading experiments" /></GlassCard>}
+      isEmpty={(page) => page.items.length === 0}
+      empty={NO_VARIANTS}
+    >
+      {(page) => <ExperimentById id={page.items[0].id} />}
     </QueryState>
   );
 }
