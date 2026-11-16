@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 from uuid import UUID
 
 from alembic.config import Config
@@ -46,3 +47,32 @@ class FakeQueue:
         if self.fail:
             raise ConnectionError("redis down")
         self.sent.append((task, job_id))
+
+
+@dataclass
+class FakeStorage:
+    """An in-memory bucket. `put` stands in for the browser's direct upload."""
+
+    objects: dict[str, bytes] = field(default_factory=dict)
+    deleted: list[str] = field(default_factory=list)
+
+    def put(self, key: str, data: bytes) -> None:
+        self.objects[key] = data
+
+    def upload_url(self, key: str, content_type: str, size_bytes: int) -> str:
+        return f"https://r2.example/{quote(key)}?type={quote(content_type)}&size={size_bytes}&signed=1"
+
+    def download_url(self, key: str) -> str:
+        return f"https://r2.example/{quote(key)}?signed=1"
+
+    async def size_of(self, key: str) -> int | None:
+        data = self.objects.get(key)
+        return None if data is None else len(data)
+
+    async def download_to(self, key: str, path: Path) -> None:
+        path.write_bytes(self.objects[key])
+
+    async def delete(self, keys: list[str]) -> None:
+        for key in keys:
+            self.objects.pop(key, None)
+            self.deleted.append(key)

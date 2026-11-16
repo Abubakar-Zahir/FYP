@@ -104,3 +104,19 @@ Changing the key makes stored tokens unreadable, and every creator has to reconn
 `GET /api/v1/reels?limit=&cursor=&source=` lists reels newest first. Pass `next_cursor` back as `cursor`. Metrics are `null` when Instagram has none yet.
 
 A daily `beat` task refreshes tokens that expire within 10 days. Disconnecting deletes imported reels and comments. Uploaded reference reels stay until the user deletes their account.
+
+## Reference reel upload
+
+Reference reels are uploaded files, never links (CLAUDE.md hard constraint 1). The video goes from the browser straight to Cloudflare R2:
+
+1. `POST /api/v1/reels/reference {filename, content_type, size_bytes}` checks the type (`video/mp4` or `video/quicktime`) and size (up to 200 MB), creates the reel row, and returns `upload_url` and `upload_headers`. The URL is signed for that exact type and size and lasts 15 minutes.
+2. The browser sends `PUT upload_url` with the file and those headers.
+3. The browser calls `POST /api/v1/dna/analyse` (next PR). The worker checks the 90-second limit, because only reading the file can tell it.
+
+`DELETE /api/v1/reels/{id}` deletes the file and the row. `DELETE /me` deletes every stored file first, and refuses with `503 storage_not_configured` rather than leave files behind.
+
+Set `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY` and `R2_BUCKET`. The bucket also needs a CORS rule in the Cloudflare dashboard (R2 > bucket > Settings > CORS policy), or browsers can't upload:
+
+```json
+[{ "AllowedOrigins": ["http://localhost:3000", "https://your-app.vercel.app"], "AllowedMethods": ["PUT", "GET"], "AllowedHeaders": ["Content-Type"], "MaxAgeSeconds": 3600 }]
+```

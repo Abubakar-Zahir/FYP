@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     # The web app's /connect/instagram page, registered on the Meta app.
     instagram_redirect_uri: str | None = None
 
+    r2_account_id: str | None = None
+    r2_access_key: str | None = None
+    r2_secret_key: SecretStr | None = None
+    r2_bucket: str | None = None
+
     llm_provider: LlmProviderName | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None

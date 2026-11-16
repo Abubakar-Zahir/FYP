@@ -7,11 +7,12 @@ from alembic import command
 from app.core.security import get_token_verifier
 from app.core.settings import Settings
 from app.main import create_app
+from app.services.storage import get_optional_storage, get_storage
 from app.workers.queue import get_job_queue
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from tests.support import FakeQueue, FakeVerifier, alembic_config
+from tests.support import FakeQueue, FakeStorage, FakeVerifier, alembic_config
 
 
 @pytest.fixture
@@ -44,8 +45,15 @@ def queue() -> FakeQueue:
 
 
 @pytest.fixture
-def client(app: FastAPI, queue: FakeQueue) -> Iterator[TestClient]:
+def storage() -> FakeStorage:
+    return FakeStorage()
+
+
+@pytest.fixture
+def client(app: FastAPI, queue: FakeQueue, storage: FakeStorage) -> Iterator[TestClient]:
     app.dependency_overrides[get_token_verifier] = FakeVerifier
     app.dependency_overrides[get_job_queue] = lambda: queue
+    app.dependency_overrides[get_storage] = lambda: storage
+    app.dependency_overrides[get_optional_storage] = lambda: storage
     with TestClient(app) as test_client:
         yield test_client

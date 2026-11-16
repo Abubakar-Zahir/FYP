@@ -14,6 +14,7 @@ from app.core.errors import register_error_handlers
 from app.core.security import TokenVerifier
 from app.core.settings import Settings, get_settings
 from app.db.session import create_engine, create_session_factory
+from app.services.storage import build_storage
 from app.workers.queue import CeleryJobQueue, JobQueue
 
 API_PREFIX = "/api/v1"
@@ -34,6 +35,7 @@ def create_app(settings: Settings) -> FastAPI:
         engine = create_engine(settings.database_url) if settings.database_url else None
         application.state.session_factory = create_session_factory(engine) if engine else None
         application.state.job_queue = _job_queue(settings)
+        application.state.storage = build_storage(settings)
         async with httpx.AsyncClient() as http:
             application.state.http = http
             issuer = settings.supabase_issuer
