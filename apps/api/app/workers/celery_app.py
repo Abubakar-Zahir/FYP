@@ -8,6 +8,7 @@ On Windows, use `;` instead of `:` in PYTHONPATH and add `--pool=solo`.
 from celery import Celery
 from celery.schedules import crontab
 
+from app.core.observability import init_sentry
 from app.core.settings import Settings, get_settings
 from app.workers.tasks import TASK_QUEUES, Queue, TaskName
 
@@ -29,6 +30,7 @@ MAX_RETRIES = 3
 
 
 def create_celery(settings: Settings) -> Celery:
+    init_sentry(settings)
     celery = Celery("fyp", broker=settings.redis_url, include=TASK_MODULES)
     celery.conf.update(
         task_default_queue=Queue.DEFAULT.value,

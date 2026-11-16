@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     database_url: str | None = None
     redis_url: str | None = None
     cors_origins: list[str] = ["http://localhost:3000"]
+    environment: str = "development"
+    sentry_dsn: SecretStr | None = None
 
     token_encryption_key: SecretStr | None = None
     instagram_app_id: str | None = None

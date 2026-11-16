@@ -186,3 +186,9 @@ The weekly report (`ml/reports/weekly.py`) is built from the creator's own data 
 - the variant learner's findings once a feature has 3 or more tests and wins more than half.
 
 The `beat` service builds it every Monday at 06:00 UTC. `POST /api/v1/reports/weekly` rebuilds it now, and `GET /api/v1/reports/weekly` returns the latest one.
+
+## Rate limits, request ids, error tracking
+
+- **Rate limits.** Writes (POST, PUT, PATCH, DELETE) are limited per sign-in token, or per IP without one: 60 a minute, and 10 a minute for `/instagram/*`. Going over returns `429 rate_limited` with `Retry-After`. Counts live in Redis when `REDIS_URL` is set, so all API processes share them. If Redis fails, requests go through and the failure is logged.
+- **Request ids.** Every response carries `X-Request-ID`, and each request is logged with its method, path, status and time, never its body.
+- **Error tracking.** Sentry starts when `SENTRY_DSN` is set, in both the API and the workers, with personal data and request bodies off.
