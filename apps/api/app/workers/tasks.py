@@ -20,6 +20,9 @@ class TaskName(StrEnum):
     COMMENTS_SYNC = "comments.sync"
     HOOKS_SCORE = "hooks.score"
     VIDEOS_EDIT = "videos.edit"
+    EXPERIMENTS_CREATE = "experiments.create"
+    EXPERIMENTS_PUBLISH = "experiments.publish"
+    EXPERIMENTS_COLLECT_INSIGHTS = "experiments.collect_insights"
 
 
 TASK_QUEUES: dict[TaskName, Queue] = {
@@ -30,4 +33,8 @@ TASK_QUEUES: dict[TaskName, Queue] = {
     TaskName.COMMENTS_SYNC: Queue.AI,
     TaskName.HOOKS_SCORE: Queue.AI,
     TaskName.VIDEOS_EDIT: Queue.VIDEO,
+    TaskName.EXPERIMENTS_CREATE: Queue.AI,
+    # Publishing renders each variant's hook overlay with FFmpeg first.
+    TaskName.EXPERIMENTS_PUBLISH: Queue.VIDEO,
+    TaskName.EXPERIMENTS_COLLECT_INSIGHTS: Queue.DEFAULT,
 }
