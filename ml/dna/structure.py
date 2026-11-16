@@ -5,12 +5,12 @@ framework imports (rules.md 3.9). On a bad answer it retries once, telling the m
 was wrong, then gives up rather than storing a half-filled record.
 """
 
-import json
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field
 
+from ml.common.llm_json import LlmAnswerError, parse_json_answer
 from ml.dna.schema import Beat, DnaRecord, HookType, Overlay, ReelSignals
 
 PROMPT_VERSION = "dna-structure-v1"
@@ -105,22 +105,11 @@ def build_prompt(signals: ReelSignals) -> StructuringPrompt:
     return StructuringPrompt(system=system, user=user)
 
 
-def _strip_code_fence(raw: str) -> str:
-    text = raw.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1] if "\n" in text else ""
-        text = text.rsplit("```", 1)[0]
-    return text.strip()
-
-
 def parse_response(raw: str, signals: ReelSignals) -> _LlmAnswer:
     try:
-        answer = _LlmAnswer.model_validate(json.loads(_strip_code_fence(raw)))
-    except json.JSONDecodeError as error:
-        raise StructuringError("The answer was not valid JSON.") from error
-    except ValidationError as error:
-        problems = "; ".join(f"{'.'.join(map(str, item['loc']))}: {item['msg']}" for item in error.errors())
-        raise StructuringError(f"The JSON did not match the format: {problems}") from error
+        answer = parse_json_answer(raw, _LlmAnswer)
+    except LlmAnswerError as error:
+        raise StructuringError(str(error)) from error
     _check_beats(answer.beats, signals.length_s)
     return answer
 

@@ -10,7 +10,7 @@ from celery import Celery
 from app.core.settings import Settings, get_settings
 from app.workers.tasks import TASK_QUEUES, Queue, TaskName
 
-TASK_MODULES = ["app.workers.instagram_tasks", "app.workers.dna_tasks"]
+TASK_MODULES = ["app.workers.instagram_tasks", "app.workers.dna_tasks", "app.workers.script_tasks"]
 TOKEN_REFRESH_EVERY_S = 24 * 60 * 60
 # Hard limit kills a stuck task. The soft limit comes first so cleanup in `finally` can run.
 TASK_SOFT_TIME_LIMIT_S = 15 * 60
