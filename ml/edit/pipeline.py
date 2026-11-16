@@ -64,3 +64,10 @@ def edit_video(
     return EditOutcome(
         duration_s=duration, removed_silence_s=removed_seconds(segments, length_s), segments=segments
     )
+
+
+def overlay_hook(ffmpeg: str, source: Path, output: Path, hook_text: str) -> None:
+    """Burns only a variant's hook line onto an already edited video (Phase 3 variants)."""
+    captions = output.parent / f"{output.stem}.ass"
+    captions.write_text(build_ass([], CaptionStyle.BOLD_POP, hook_text), encoding="utf-8")
+    run(build_command(ffmpeg, source, output, None, captions, progress_bar=False, output_length_s=0))

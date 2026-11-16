@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, String, Text, func
+from sqlalchemy import Boolean, DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -29,6 +29,8 @@ class InstagramAccount(Base):
     encrypted_token: Mapped[str] = mapped_column(Text)
     token_expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     scopes: Mapped[str] = mapped_column(Text)
+    # Learned from the first publish: True once a Trial Reel went through, False if Instagram refused one.
+    trial_reels_eligible: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
