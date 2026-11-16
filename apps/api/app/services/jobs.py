@@ -28,10 +28,22 @@ async def get_job_for_user(session: AsyncSession, job_id: UUID, user_id: UUID) -
 
 
 async def start_job(
-    session: AsyncSession, queue: JobQueue, user_id: UUID, task: TaskName, subject_id: UUID | None = None
+    session: AsyncSession,
+    queue: JobQueue,
+    user_id: UUID,
+    task: TaskName,
+    subject_id: UUID | None = None,
+    payload: dict[str, Any] | None = None,
 ) -> Job:
     """Commits the row before enqueueing, so a fast worker always finds it."""
-    job = Job(user_id=user_id, type=task.value, subject_id=subject_id, status=JobStatus.QUEUED, progress=0.0)
+    job = Job(
+        user_id=user_id,
+        type=task.value,
+        subject_id=subject_id,
+        payload=payload,
+        status=JobStatus.QUEUED,
+        progress=0.0,
+    )
     session.add(job)
     await session.commit()
     try:

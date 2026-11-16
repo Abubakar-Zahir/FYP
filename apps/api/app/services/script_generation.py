@@ -14,6 +14,7 @@ from app.models.reel import Reel, ReelSource
 from app.models.script import Script
 from app.schemas.scripts import GenerateResult
 from app.services import llm, users
+from app.services.hook_scoring import load_scorer, scored_hooks
 from app.workers.runner import JobContext, JobFailure, JobHandler, TransientJobError
 from ml.dna.schema import DnaRecord
 from ml.scripts.generate import (
@@ -94,7 +95,8 @@ async def _generate(context: JobContext, http_factory: HttpFactory) -> GenerateR
         except (llm.LlmRequestRejected, llm.LlmBadResponse, ScriptGenerationError) as error:
             logger.warning("Script generation failed: %s", type(error).__name__)
             raise JobFailure("script_generation_failed") from error
-    script.hooks = [{"text": hook.text, "score": None, "top_factors": []} for hook in draft.hooks]
+    scorer = load_scorer(context.settings)
+    script.hooks = scored_hooks(scorer, [hook.text for hook in draft.hooks], request.templates[0].hook_type)
     script.angles = [angle.model_dump() for angle in draft.angles]
     script.body = [beat.model_dump() for beat in draft.body]
     script.model_version = draft.model_version

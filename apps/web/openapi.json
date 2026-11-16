@@ -304,6 +304,34 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "HookScoreRequest": {
+        "properties": {
+          "hook_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HookType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hooks": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Hooks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hooks"
+        ],
+        "title": "HookScoreRequest",
+        "type": "object"
+      },
       "HookType": {
         "enum": [
           "question",
@@ -1451,6 +1479,54 @@
         "summary": "Read Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/hooks/score": {
+      "post": {
+        "description": "Scores up to 10 hooks. The job result holds `hooks` in the ScoredHook shape and `model_version`.",
+        "operationId": "score_hooks_api_v1_hooks_score_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HookScoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Score Hooks",
+        "tags": [
+          "scripts",
+          "hooks"
         ]
       }
     },
