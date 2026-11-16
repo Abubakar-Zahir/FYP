@@ -152,6 +152,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/experiments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Experiments */
+        get: operations["list_experiments_api_v1_experiments_get"];
+        put?: never;
+        /**
+         * Create Experiment
+         * @description Writes candidate variants and lets the variant learner pick which to test. Result: `experiment_id`.
+         */
+        post: operations["create_experiment_api_v1_experiments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiments/{experiment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Experiment */
+        get: operations["read_experiment_api_v1_experiments__experiment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiments/{experiment_id}/share-winner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Share Winner
+         * @description Instagram's API can't share a Trial Reel with followers (open decision 1 in status.md).
+         *     This records the request, and `share_instructions` tells the creator how to do it in the app.
+         */
+        post: operations["share_winner_api_v1_experiments__experiment_id__share_winner_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -533,6 +592,21 @@ export interface components {
             /** Theme */
             theme: string;
         };
+        /** CreateExperimentRequest */
+        CreateExperimentRequest: {
+            /** Script Id */
+            script_id?: string | null;
+            /**
+             * Variant Count
+             * @default 3
+             */
+            variant_count: number;
+            /**
+             * Video Id
+             * Format: uuid
+             */
+            video_id: string;
+        };
         /**
          * DnaClusterOut
          * @description One format group. Null outlier when none of its reels has one (reference reels).
@@ -611,6 +685,33 @@ export interface components {
              */
             roman_urdu_captions: boolean;
         };
+        /** ExperimentOut */
+        ExperimentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Share Instructions */
+            share_instructions: string | null;
+            status: components["schemas"]["ExperimentStatus"];
+            /**
+             * Strategy
+             * @constant
+             */
+            strategy: "thompson_sampling";
+            /** Variants */
+            variants: components["schemas"]["VariantOut"][];
+            /** Video Title */
+            video_title: string;
+            /** Winner Variant Id */
+            winner_variant_id: string | null;
+        };
+        /**
+         * ExperimentStatus
+         * @enum {string}
+         */
+        ExperimentStatus: "draft" | "publishing" | "live" | "done";
         /** GenerateScriptRequest */
         GenerateScriptRequest: {
             language: components["schemas"]["ScriptLanguage"];
@@ -645,6 +746,11 @@ export interface components {
          * @enum {string}
          */
         HookType: "question" | "bold_claim" | "pattern_interrupt" | "story" | "list" | "other";
+        /**
+         * InsightWindow
+         * @enum {string}
+         */
+        InsightWindow: "24h" | "72h";
         /** InstagramAccountOut */
         InstagramAccountOut: {
             /** Account Type */
@@ -759,6 +865,13 @@ export interface components {
         Page_DnaRecordOut_: {
             /** Items */
             items: components["schemas"]["DnaRecordOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** Page[ExperimentOut] */
+        Page_ExperimentOut_: {
+            /** Items */
+            items: components["schemas"]["ExperimentOut"][];
             /** Next Cursor */
             next_cursor: string | null;
         };
@@ -918,6 +1031,53 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** VariantInsightOut */
+        VariantInsightOut: {
+            /** Reach */
+            reach: number | null;
+            /** Saves */
+            saves: number | null;
+            /** Shares */
+            shares: number | null;
+            /** Views */
+            views: number | null;
+            window: components["schemas"]["InsightWindow"];
+        };
+        /**
+         * VariantOut
+         * @description Field names match apps/web.
+         */
+        VariantOut: {
+            /** Caption */
+            caption: string;
+            /** Error */
+            error: string | null;
+            /** Hook Line */
+            hook_line: string;
+            /** Hook Style */
+            hook_style: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Insights */
+            insights: components["schemas"]["VariantInsightOut"][];
+            /** Is Trial */
+            is_trial: boolean;
+            /** Label */
+            label: string;
+            /** Opener */
+            opener: string;
+            /** Permalink */
+            permalink: string | null;
+            status: components["schemas"]["VariantStatus"];
+        };
+        /**
+         * VariantStatus
+         * @enum {string}
+         */
+        VariantStatus: "draft" | "publishing" | "live" | "failed";
         /**
          * VideoContentType
          * @enum {string}
@@ -1156,6 +1316,133 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DnaRecordOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_experiments_api_v1_experiments_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ExperimentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_experiment_api_v1_experiments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExperimentRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_experiment_api_v1_experiments__experiment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                experiment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    share_winner_api_v1_experiments__experiment_id__share_winner_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                experiment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentOut"];
                 };
             };
             /** @description Validation Error */

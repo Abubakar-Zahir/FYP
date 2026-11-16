@@ -156,6 +156,39 @@
         "title": "CommentThemeOut",
         "type": "object"
       },
+      "CreateExperimentRequest": {
+        "properties": {
+          "script_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Script Id"
+          },
+          "variant_count": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 3.0,
+            "title": "Variant Count",
+            "type": "integer"
+          },
+          "video_id": {
+            "format": "uuid",
+            "title": "Video Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "video_id"
+        ],
+        "title": "CreateExperimentRequest",
+        "type": "object"
+      },
       "DnaClusterOut": {
         "description": "One format group. Null outlier when none of its reels has one (reference reels).",
         "properties": {
@@ -356,6 +389,78 @@
         "title": "EditRequest",
         "type": "object"
       },
+      "ExperimentOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "share_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Instructions"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExperimentStatus"
+          },
+          "strategy": {
+            "const": "thompson_sampling",
+            "title": "Strategy",
+            "type": "string"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantOut"
+            },
+            "title": "Variants",
+            "type": "array"
+          },
+          "video_title": {
+            "title": "Video Title",
+            "type": "string"
+          },
+          "winner_variant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Winner Variant Id"
+          }
+        },
+        "required": [
+          "id",
+          "video_title",
+          "strategy",
+          "status",
+          "winner_variant_id",
+          "share_instructions",
+          "variants"
+        ],
+        "title": "ExperimentOut",
+        "type": "object"
+      },
+      "ExperimentStatus": {
+        "enum": [
+          "draft",
+          "publishing",
+          "live",
+          "done"
+        ],
+        "title": "ExperimentStatus",
+        "type": "string"
+      },
       "GenerateScriptRequest": {
         "properties": {
           "language": {
@@ -450,6 +555,14 @@
           "other"
         ],
         "title": "HookType",
+        "type": "string"
+      },
+      "InsightWindow": {
+        "enum": [
+          "24h",
+          "72h"
+        ],
+        "title": "InsightWindow",
         "type": "string"
       },
       "InstagramAccountOut": {
@@ -776,6 +889,34 @@
           "next_cursor"
         ],
         "title": "Page[DnaRecordOut]",
+        "type": "object"
+      },
+      "Page_ExperimentOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[ExperimentOut]",
         "type": "object"
       },
       "Page_ReelOut_": {
@@ -1247,6 +1388,157 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VariantInsightOut": {
+        "properties": {
+          "reach": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reach"
+          },
+          "saves": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saves"
+          },
+          "shares": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shares"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          },
+          "window": {
+            "$ref": "#/components/schemas/InsightWindow"
+          }
+        },
+        "required": [
+          "window",
+          "views",
+          "reach",
+          "saves",
+          "shares"
+        ],
+        "title": "VariantInsightOut",
+        "type": "object"
+      },
+      "VariantOut": {
+        "description": "Field names match apps/web.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "hook_line": {
+            "title": "Hook Line",
+            "type": "string"
+          },
+          "hook_style": {
+            "title": "Hook Style",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "insights": {
+            "items": {
+              "$ref": "#/components/schemas/VariantInsightOut"
+            },
+            "title": "Insights",
+            "type": "array"
+          },
+          "is_trial": {
+            "title": "Is Trial",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "opener": {
+            "title": "Opener",
+            "type": "string"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VariantStatus"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "hook_line",
+          "hook_style",
+          "opener",
+          "caption",
+          "is_trial",
+          "status",
+          "permalink",
+          "error",
+          "insights"
+        ],
+        "title": "VariantOut",
+        "type": "object"
+      },
+      "VariantStatus": {
+        "enum": [
+          "draft",
+          "publishing",
+          "live",
+          "failed"
+        ],
+        "title": "VariantStatus",
+        "type": "string"
+      },
       "VideoContentType": {
         "enum": [
           "video/mp4",
@@ -1678,6 +1970,215 @@
         "summary": "Save Template",
         "tags": [
           "dna"
+        ]
+      }
+    },
+    "/api/v1/experiments": {
+      "get": {
+        "operationId": "list_experiments_api_v1_experiments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ExperimentOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Experiments",
+        "tags": [
+          "experiments"
+        ]
+      },
+      "post": {
+        "description": "Writes candidate variants and lets the variant learner pick which to test. Result: `experiment_id`.",
+        "operationId": "create_experiment_api_v1_experiments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExperimentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Experiment",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
+    "/api/v1/experiments/{experiment_id}": {
+      "get": {
+        "operationId": "read_experiment_api_v1_experiments__experiment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Experiment",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
+    "/api/v1/experiments/{experiment_id}/share-winner": {
+      "post": {
+        "description": "Instagram's API can't share a Trial Reel with followers (open decision 1 in status.md).\nThis records the request, and `share_instructions` tells the creator how to do it in the app.",
+        "operationId": "share_winner_api_v1_experiments__experiment_id__share_winner_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Share Winner",
+        "tags": [
+          "experiments"
         ]
       }
     },
