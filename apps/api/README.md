@@ -54,11 +54,15 @@ Long work (imports, DNA, scripts) runs in Celery workers, never in a request han
 
 Errors are codes, never exception text, because exception text can hold tokens or user data. `TransientJobError` retries with backoff. `JobFailure` fails at once.
 
-Set `REDIS_URL` (for example `redis://localhost:6379/0`), then start a worker from `apps/api`:
+Set `REDIS_URL` (for example `redis://localhost:6379/0`), then start a worker from the repo root, so it can import both `app` and `ml`:
 
 ```
-uv run celery -A app.workers.celery_app worker --queues default,ai -l info
+PYTHONPATH=apps/api:. uv run celery -A app.workers.celery_app worker --queues default,ai -l info
+PYTHONPATH=apps/api:. uv run --group video celery -A app.workers.celery_app worker --queues video --concurrency 1 -l info
+PYTHONPATH=apps/api:. uv run celery -A app.workers.celery_app beat -l info
 ```
+
+On Windows, use `;` instead of `:` and add `--pool=solo` to the workers.
 
 Without `REDIS_URL`, endpoints that start jobs answer `503 jobs_not_configured`.
 
@@ -92,3 +96,11 @@ uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_
 ```
 
 Changing the key makes stored tokens unreadable, and every creator has to reconnect. `DELETE /me` also removes the Instagram account and the user's jobs.
+
+## Reel import
+
+`instagram.import` (default queue) reads the last 50 reels with their insights and comments, and upserts them, so running it again never duplicates anything. It then sets each reel's outlier score: its views over the account's median, or `null` with fewer than 5 reels (`ml/dna/outlier.py`).
+
+`GET /api/v1/reels?limit=&cursor=&source=` lists reels newest first. Pass `next_cursor` back as `cursor`. Metrics are `null` when Instagram has none yet.
+
+A daily `beat` task refreshes tokens that expire within 10 days. Disconnecting deletes imported reels and comments. Uploaded reference reels stay until the user deletes their account.

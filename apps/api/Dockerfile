@@ -8,7 +8,9 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH="/opt/venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    # The API and workers import both app (apps/api) and ml (repo root).
+    PYTHONPATH=/srv/apps/api:/srv
 
 WORKDIR /srv
 
