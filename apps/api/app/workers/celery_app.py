@@ -19,6 +19,7 @@ TASK_MODULES = [
     "app.workers.experiment_tasks",
 ]
 TOKEN_REFRESH_EVERY_S = 24 * 60 * 60
+INSIGHTS_EVERY_S = 30 * 60
 # Hard limit kills a stuck task. The soft limit comes first so cleanup in `finally` can run.
 TASK_SOFT_TIME_LIMIT_S = 15 * 60
 TASK_TIME_LIMIT_S = TASK_SOFT_TIME_LIMIT_S + 60
@@ -45,6 +46,10 @@ def create_celery(settings: Settings) -> Celery:
             "refresh-instagram-tokens": {
                 "task": TaskName.INSTAGRAM_REFRESH_TOKENS.value,
                 "schedule": TOKEN_REFRESH_EVERY_S,
+            },
+            "collect-variant-insights": {
+                "task": TaskName.EXPERIMENTS_COLLECT_INSIGHTS.value,
+                "schedule": INSIGHTS_EVERY_S,
             },
         },
     )

@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     hook_scorer_path: str | None = None
     whisper_model: str = "small"
     ffmpeg_path: str = "ffmpeg"
+    # MANUAL: the creator shares the winner in the app. SS_PERFORMANCE: Instagram decides.
+    trial_graduation_strategy: str = "MANUAL"
     dna_cut_threshold: float = Field(default=27.0, gt=0)
 
     llm_provider: LlmProviderName | None = None

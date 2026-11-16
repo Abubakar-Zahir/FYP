@@ -166,3 +166,12 @@ The worker builds the prompt from the template's structure, the creator's niche,
 4. The job result, and `GET /api/v1/videos/{id}`, give `output_url` (valid for an hour), `duration_s` and `removed_silence_s`.
 
 The `ml/edit/` code holds the cut, caption, transliteration and render logic. The video worker image installs `ffmpeg`. Error codes: `video_too_long`, `video_unreadable`, `upload_missing`, `render_failed`.
+
+## Variants, publishing and the variant learner
+
+1. `POST /api/v1/experiments {video_id, script_id?, variant_count}`: the LLM writes candidates, and the Thompson sampling learner picks which 3 to 5 to test.
+2. `POST /api/v1/experiments/{id}/publish`: `experiments.publish` (video queue) checks the publishing quota. Then, for each variant, it burns the hook line onto the edited video, uploads it, and publishes it as a Trial Reel (`TRIAL_GRADUATION_STRATEGY`, default `MANUAL`), with a cover frame chosen by the opener type.
+   - If Instagram refuses the first Trial Reel, the account is marked not eligible. Only the learner's top pick goes out, as a normal reel (FR-6.8), because posting every variant publicly would look like duplicate content.
+   - A retry never republishes a variant that is already live.
+3. Every 30 minutes, the `beat` task `experiments.collect_insights` stores insights at 24 h (preliminary, data can lag) and 72 h. Once every live variant has 72 h numbers, it picks the winner on views, and the learner records whether each variant beat the creator's median views.
+4. `POST /api/v1/experiments/{id}/share-winner` records the request and returns `share_instructions`. The API can't share a Trial Reel with followers, so the creator does it in the app.

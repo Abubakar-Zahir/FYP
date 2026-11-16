@@ -6,6 +6,7 @@ Publishing stays in the spike until Phase 3.
 """
 
 from datetime import UTC, datetime, timedelta
+from enum import StrEnum
 from typing import Any
 from urllib.parse import urlencode
 
@@ -30,6 +31,20 @@ REEL_PRODUCT_TYPE = "REELS"
 MEDIA_PAGE_SIZE = 50
 COMMENTS_PAGE_SIZE = 50
 RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
+
+
+FINISHED_STATUS = "FINISHED"
+FAILED_STATUSES = frozenset({"ERROR", "EXPIRED"})
+
+
+class GraduationStrategy(StrEnum):
+    MANUAL = "MANUAL"  # the creator shares the winner from the Instagram app
+    SS_PERFORMANCE = "SS_PERFORMANCE"  # Instagram shares it if it performs well
+
+
+class PublishingLimit(BaseModel):
+    quota_usage: int
+    quota_total: int | None = None
 
 
 class InstagramError(Exception):
@@ -205,3 +220,40 @@ class InstagramClient:
         if not isinstance(url, str):
             raise InstagramError("No media_url for this media")
         return url
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return await _send(
+            self._http, "POST", f"{GRAPH_URL}/{path}", params={"access_token": self._token}, json=payload
+        )
+
+    async def publishing_limit(self, ig_id: str) -> PublishingLimit:
+        body = await self._get(f"{ig_id}/content_publishing_limit", fields="quota_usage,config")
+        entry = body["data"][0]
+        return PublishingLimit(
+            quota_usage=entry["quota_usage"], quota_total=entry.get("config", {}).get("quota_total")
+        )
+
+    async def create_reel_container(
+        self,
+        ig_id: str,
+        video_url: str,
+        caption: str,
+        trial: GraduationStrategy | None,
+        thumb_offset_ms: int | None = None,
+    ) -> str:
+        payload: dict[str, Any] = {"media_type": "REELS", "video_url": video_url, "caption": caption}
+        if trial is not None:
+            payload["trial_params"] = {"graduation_strategy": trial.value}
+        if thumb_offset_ms is not None:
+            payload["thumb_offset"] = thumb_offset_ms
+        return str((await self._post(f"{ig_id}/media", payload))["id"])
+
+    async def container_status(self, container_id: str) -> str:
+        return str((await self._get(container_id, fields="status_code")).get("status_code"))
+
+    async def publish(self, ig_id: str, container_id: str) -> str:
+        return str((await self._post(f"{ig_id}/media_publish", {"creation_id": container_id}))["id"])
+
+    async def permalink(self, media_id: str) -> str | None:
+        link = (await self._get(media_id, fields="permalink")).get("permalink")
+        return str(link) if link else None

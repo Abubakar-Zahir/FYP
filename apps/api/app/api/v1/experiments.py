@@ -7,10 +7,12 @@ from app.core.errors import ApiError
 from app.core.pagination import DEFAULT_PAGE_SIZE, CursorQuery, LimitQuery, Page
 from app.core.security import CurrentUserDependency
 from app.db.session import SessionDependency
+from app.models.experiment import ExperimentStatus
 from app.schemas.experiments import CreateExperimentRequest, ExperimentOut
 from app.schemas.jobs import JobAccepted
-from app.services import experiments
+from app.services import experiments, jobs
 from app.workers.queue import JobQueueDependency
+from app.workers.tasks import TaskName
 
 router = APIRouter(tags=["experiments"])
 
@@ -60,3 +62,20 @@ async def share_winner(
     experiment.share_requested_at = datetime.now(UTC)
     await session.commit()
     return await experiments.to_out(session, experiment)
+
+
+@router.post("/experiments/{experiment_id}/publish", status_code=status.HTTP_202_ACCEPTED)
+async def publish_experiment(
+    experiment_id: UUID,
+    identity: CurrentUserDependency,
+    session: SessionDependency,
+    queue: JobQueueDependency,
+) -> JobAccepted:
+    """Publishes the draft variants as Trial Reels. Insights arrive at 24 h and 72 h."""
+    experiment = await experiments.get_for_user(session, experiment_id, identity.id)
+    if experiment.status not in (ExperimentStatus.DRAFT, ExperimentStatus.PUBLISHING):
+        raise ApiError(status.HTTP_409_CONFLICT, "already_published", "This experiment is already published.")
+    job = await jobs.start_job(
+        session, queue, identity.id, TaskName.EXPERIMENTS_PUBLISH, subject_id=experiment.id
+    )
+    return JobAccepted(job_id=job.id)
