@@ -156,6 +156,60 @@
         "title": "CommentThemeOut",
         "type": "object"
       },
+      "DnaClusterOut": {
+        "description": "One format group. Null outlier when none of its reels has one (reference reels).",
+        "properties": {
+          "dna_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Dna Ids",
+            "type": "array"
+          },
+          "hook_type": {
+            "$ref": "#/components/schemas/HookType"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "median_length_s": {
+            "title": "Median Length S",
+            "type": "number"
+          },
+          "median_outlier": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Outlier"
+          },
+          "median_pacing_cuts_per_10s": {
+            "title": "Median Pacing Cuts Per 10S",
+            "type": "number"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "size",
+          "hook_type",
+          "median_pacing_cuts_per_10s",
+          "median_length_s",
+          "median_outlier",
+          "dna_ids"
+        ],
+        "title": "DnaClusterOut",
+        "type": "object"
+      },
       "DnaRecordOut": {
         "description": "What the DNA library and detail screens show. Field names match apps/web.",
         "properties": {
@@ -1494,6 +1548,37 @@
           }
         ],
         "summary": "Analyse",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
+    "/api/v1/dna/clusters": {
+      "get": {
+        "description": "Format groups across the creator's analysed reels. Empty with fewer than 6 records.",
+        "operationId": "read_clusters_api_v1_dna_clusters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DnaClusterOut"
+                  },
+                  "title": "Response Read Clusters Api V1 Dna Clusters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Clusters",
         "tags": [
           "dna"
         ]

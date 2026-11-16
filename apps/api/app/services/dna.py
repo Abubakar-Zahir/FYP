@@ -1,3 +1,4 @@
+import asyncio
 from uuid import UUID
 
 from fastapi import status
@@ -9,12 +10,13 @@ from app.core.pagination import Page, decode_cursor, encode_cursor
 from app.models.dna import DnaRecordRow
 from app.models.job import Job
 from app.models.reel import Reel, ReelSource
-from app.schemas.dna import DnaRecordOut
+from app.schemas.dna import DnaClusterOut, DnaRecordOut
 from app.services import instagram_accounts, jobs, reels
 from app.services.reels import as_utc
 from app.services.storage import Storage, storage_not_configured
 from app.workers.queue import JobQueue
 from app.workers.tasks import TaskName
+from ml.dna.clusters import cluster_formats
 from ml.dna.schema import DnaRecord
 
 
@@ -105,3 +107,34 @@ async def start_analysis(
     elif await instagram_accounts.get_account(session, user_id) is None:
         raise instagram_accounts.not_connected()
     return await jobs.start_job(session, queue, user_id, TaskName.DNA_ANALYSE, subject_id=reel.id)
+
+
+MAX_CLUSTERED_RECORDS = 500
+
+
+async def clusters(session: AsyncSession, user_id: UUID) -> list[DnaClusterOut]:
+    """K-means on a few hundred short vectors takes milliseconds, so it runs off the event loop
+    in the request rather than as a job."""
+    rows = (
+        await session.execute(
+            select(DnaRecordRow, Reel.outlier_score)
+            .join(Reel, Reel.id == DnaRecordRow.reel_id)
+            .where(DnaRecordRow.user_id == user_id)
+            .order_by(DnaRecordRow.created_at.desc())
+            .limit(MAX_CLUSTERED_RECORDS)
+        )
+    ).all()
+    records = [DnaRecord.model_validate(row.record) for row, _ in rows]
+    found = await asyncio.to_thread(cluster_formats, records, [score for _, score in rows])
+    return [
+        DnaClusterOut(
+            label=cluster.label,
+            size=len(cluster.members),
+            hook_type=cluster.hook_type,
+            median_pacing_cuts_per_10s=cluster.median_pacing,
+            median_length_s=cluster.median_length_s,
+            median_outlier=cluster.median_outlier,
+            dna_ids=[rows[index][0].id for index in cluster.members],
+        )
+        for cluster in found
+    ]

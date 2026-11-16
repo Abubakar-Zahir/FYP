@@ -5,7 +5,7 @@ from fastapi import APIRouter, status
 from app.core.pagination import DEFAULT_PAGE_SIZE, CursorQuery, LimitQuery, Page
 from app.core.security import CurrentUserDependency
 from app.db.session import SessionDependency
-from app.schemas.dna import AnalyseRequest, DnaRecordOut
+from app.schemas.dna import AnalyseRequest, DnaClusterOut, DnaRecordOut
 from app.schemas.jobs import JobAccepted
 from app.services import dna
 from app.services.storage import OptionalStorageDependency
@@ -36,6 +36,12 @@ async def list_dna(
     templates_only: bool = False,
 ) -> Page[DnaRecordOut]:
     return await dna.list_for_user(session, identity.id, limit, cursor, templates_only)
+
+
+@router.get("/dna/clusters")
+async def read_clusters(identity: CurrentUserDependency, session: SessionDependency) -> list[DnaClusterOut]:
+    """Format groups across the creator's analysed reels. Empty with fewer than 6 records."""
+    return await dna.clusters(session, identity.id)
 
 
 @router.get("/dna/{dna_id}")

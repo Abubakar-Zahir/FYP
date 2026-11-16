@@ -95,6 +95,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dna/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Clusters
+         * @description Format groups across the creator's analysed reels. Empty with fewer than 6 records.
+         */
+        get: operations["read_clusters_api_v1_dna_clusters_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dna/{dna_id}": {
         parameters: {
             query?: never;
@@ -512,6 +532,25 @@ export interface components {
             size: number;
             /** Theme */
             theme: string;
+        };
+        /**
+         * DnaClusterOut
+         * @description One format group. Null outlier when none of its reels has one (reference reels).
+         */
+        DnaClusterOut: {
+            /** Dna Ids */
+            dna_ids: string[];
+            hook_type: components["schemas"]["HookType"];
+            /** Label */
+            label: string;
+            /** Median Length S */
+            median_length_s: number;
+            /** Median Outlier */
+            median_outlier: number | null;
+            /** Median Pacing Cuts Per 10S */
+            median_pacing_cuts_per_10s: number;
+            /** Size */
+            size: number;
         };
         /**
          * DnaRecordOut
@@ -1044,6 +1083,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_clusters_api_v1_dna_clusters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DnaClusterOut"][];
                 };
             };
         };
