@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from app.models.user import NICHE_MAX_LENGTH, TONE_MAX_LENGTH
+from app.schemas.instagram import InstagramAccountOut
 
 GOALS_MIN_LENGTH = 5
 GOALS_MAX_LENGTH = 1000
@@ -45,5 +46,4 @@ class MeResponse(BaseModel):
     name: str | None
     email: str | None
     profile: Profile | None
-    # Filled in once Instagram connect ships (P1-03). Kept so the frontend contract is stable.
-    instagram: None = None
+    instagram: InstagramAccountOut | None

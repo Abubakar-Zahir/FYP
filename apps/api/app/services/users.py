@@ -1,11 +1,17 @@
 from uuid import UUID
 
-from sqlalchemy import delete
+from sqlalchemy import delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.instagram_account import InstagramAccount
+from app.models.job import Job
+from app.models.llm_call import LlmCall
 from app.models.user import User
 from app.schemas.me import Profile
+
+# Every table with a user_id. A new user-owned table must be added here.
+USER_OWNED_MODELS: tuple[type[InstagramAccount] | type[Job], ...] = (InstagramAccount, Job)
 
 
 def _profile_values(profile: Profile) -> dict[str, object]:
@@ -45,6 +51,12 @@ async def save_profile(session: AsyncSession, user_id: UUID, profile: Profile) -
 
 
 async def delete_user(session: AsyncSession, user_id: UUID) -> None:
-    """Idempotent, so retrying a deletion that half-worked is safe."""
+    """Removes every row the user owns, in one transaction (rules.md 6.5). Idempotent.
+
+    LLM cost rows stay for the budget total but lose the link to the person.
+    """
+    for model in USER_OWNED_MODELS:
+        await session.execute(delete(model).where(model.user_id == user_id))
     await session.execute(delete(User).where(User.id == user_id))
+    await session.execute(update(LlmCall).where(LlmCall.user_id == user_id).values(user_id=None))
     await session.commit()
