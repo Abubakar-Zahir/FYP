@@ -23,9 +23,18 @@ dev = [
     "pytest>=8.3",
     "ruff>=0.6",
 ]
+video = [
+    "av>=17,<18",
+    "faster-whisper>=1.1",
+    "opencv-python-headless>=4.10",
+    "scenedetect>=0.7.2",
+]
 
 [tool.uv]
 package = false
+# scenedetect requires the GUI build of OpenCV, which needs libGL and clashes with the
+# headless build. This marker never matches, so only opencv-python-headless is installed.
+override-dependencies = ["opencv-python; sys_platform == 'never'"]
 
 [tool.ruff]
 line-length = 110
@@ -46,7 +55,7 @@ explicit_package_bases = true
 
 # These libraries ship no type information.
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*"]
+module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

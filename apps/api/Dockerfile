@@ -13,13 +13,23 @@ ENV UV_COMPILE_BYTECODE=1 \
 WORKDIR /srv
 
 # Dependencies first, so code changes don't reinstall them.
+# The video worker builds with UV_GROUPS="--group video" to add Whisper and OpenCV.
+ARG UV_GROUPS=""
+# OpenCV, even the headless build, needs libxcb, which the slim image lacks.
+RUN case "$UV_GROUPS" in \
+      *video*) apt-get update \
+        && apt-get install -y --no-install-recommends libxcb1 \
+        && rm -rf /var/lib/apt/lists/* ;; \
+    esac
 COPY pyproject.toml uv.lock .python-version ./
-RUN uv sync --locked --no-dev --no-install-project
+RUN uv sync --locked --no-dev --no-install-project ${UV_GROUPS}
 
 COPY apps/api ./apps/api
 COPY ml ./ml
 
-RUN useradd --system --uid 10001 app
+# Whisper downloads its model here on first use. The video worker keeps it in a volume.
+ENV HF_HOME=/srv/models
+RUN useradd --system --uid 10001 app && mkdir -p /srv/models && chown app /srv/models
 USER app
 
 EXPOSE 8000
