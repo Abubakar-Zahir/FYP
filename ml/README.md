@@ -40,3 +40,16 @@ uv run python -m ml.scoring.train data/hooks.jsonl --out data/models/hook_scorer
 ```
 
 Set `HOOK_SCORER_PATH` to the output folder. Generated scripts then come back scored. Report the Spearman correlation and its interval, never an accuracy (SRS risks, small data).
+
+## Variant learner (`ml/bandit/`)
+
+`thompson.py` keeps a Beta belief per feature value (hook style, opener, caption length). The reward is whether a variant beat the creator's median views. New creators start from a shared prior that counts as at most 4 observations, so their own results soon dominate.
+
+`simulator.py` compares Thompson sampling, epsilon-greedy and random on 50 simulated creators with hidden feature effects, using the same draws for each. Mean cumulative regret, lower is better:
+
+| Rounds | Thompson sampling | Epsilon-greedy (0.1) | Random |
+|---|---|---|---|
+| 20 | 10.40 | 8.89 | 19.26 |
+| 60 | 18.83 | 18.40 | 57.20 |
+
+Both learners have about a third of random's regret by 60 rounds, and they are close to each other. Rerun with `uv run python -m ml.bandit.report`.
