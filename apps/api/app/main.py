@@ -5,6 +5,7 @@ import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.analytics import router as analytics_router
 from app.api.v1.comments import router as comments_router
 from app.api.v1.dna import router as dna_router
 from app.api.v1.experiments import router as experiments_router
@@ -67,6 +68,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(comments_router, prefix=API_PREFIX)
     application.include_router(videos_router, prefix=API_PREFIX)
     application.include_router(experiments_router, prefix=API_PREFIX)
+    application.include_router(analytics_router, prefix=API_PREFIX)
     return application
 
 

@@ -10,6 +10,7 @@ from app.models import (  # noqa: F401  (registers the tables on Base.metadata)
     job,
     llm_call,
     reel,
+    report,
     script,
     user,
     video,

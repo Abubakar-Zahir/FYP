@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v1/analytics/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Overview
+         * @description The last 30 days against the 30 before, from imported reels.
+         */
+        get: operations["read_overview_api_v1_analytics_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/comments/summary": {
         parameters: {
             query?: never;
@@ -448,6 +468,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/weekly": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Weekly Report
+         * @description The latest report. A new one is built every Monday, or on request.
+         */
+        get: operations["read_weekly_report_api_v1_reports_weekly_get"];
+        put?: never;
+        /** Build Weekly Report */
+        post: operations["build_weekly_report_api_v1_reports_weekly_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/scripts/generate": {
         parameters: {
             query?: never;
@@ -553,6 +594,20 @@ export interface components {
              * Format: uuid
              */
             reel_id: string;
+        };
+        /**
+         * AnalyticsOverview
+         * @description Field names match apps/web. `change` is the fraction up or down on the previous period.
+         */
+        AnalyticsOverview: {
+            /** Best Formats */
+            best_formats: components["schemas"]["FormatPerformance"][];
+            change: components["schemas"]["Totals"];
+            /** Period Days */
+            period_days: number;
+            totals: components["schemas"]["Totals"];
+            /** Trend */
+            trend: components["schemas"]["TrendPoint"][];
         };
         /** Angle */
         Angle: {
@@ -732,6 +787,14 @@ export interface components {
          * @enum {string}
          */
         ExperimentStatus: "draft" | "publishing" | "live" | "done";
+        /** FormatPerformance */
+        FormatPerformance: {
+            hook_type: components["schemas"]["HookType"];
+            /** Median Outlier */
+            median_outlier: number;
+            /** Reels */
+            reels: number;
+        };
         /** GenerateScriptRequest */
         GenerateScriptRequest: {
             language: components["schemas"]["ScriptLanguage"];
@@ -766,6 +829,13 @@ export interface components {
          * @enum {string}
          */
         HookType: "question" | "bold_claim" | "pattern_interrupt" | "story" | "list" | "other";
+        /** Idea */
+        Idea: {
+            /** Title */
+            title: string;
+            /** Why */
+            why: string;
+        };
         /**
          * InsightWindow
          * @enum {string}
@@ -806,6 +876,13 @@ export interface components {
              * Format: uuid
              */
             job_id: string;
+        };
+        /** Item */
+        Item: {
+            /** Detail */
+            detail: string;
+            /** Title */
+            title: string;
         };
         /**
          * JobAccepted
@@ -1038,6 +1115,26 @@ export interface components {
             /** Topic */
             topic: string;
         };
+        /** Totals */
+        Totals: {
+            /** Avg Watch Time S */
+            avg_watch_time_s: number;
+            /** Reach */
+            reach: number;
+            /** Saves */
+            saves: number;
+            /** Shares */
+            shares: number;
+            /** Views */
+            views: number;
+        };
+        /** TrendPoint */
+        TrendPoint: {
+            /** Date */
+            date: string;
+            /** Views */
+            views: number;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -1132,6 +1229,24 @@ export interface components {
             upload_url: string;
             video: components["schemas"]["VideoOut"];
         };
+        /**
+         * WeeklyReportContent
+         * @description Field names match apps/web.
+         */
+        WeeklyReportContent: {
+            /** Headline */
+            headline: string;
+            /** Ideas */
+            ideas: components["schemas"]["Idea"][];
+            /** Losses */
+            losses: components["schemas"]["Item"][];
+            /** Themes */
+            themes: string[];
+            /** Week Start */
+            week_start: string;
+            /** Wins */
+            wins: components["schemas"]["Item"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -1141,6 +1256,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    read_overview_api_v1_analytics_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsOverview"];
+                };
+            };
+        };
+    };
     read_summary_api_v1_comments_summary_get: {
         parameters: {
             query?: never;
@@ -1844,6 +1979,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_weekly_report_api_v1_reports_weekly_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyReportContent"];
+                };
+            };
+        };
+    };
+    build_weekly_report_api_v1_reports_weekly_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
                 };
             };
         };
