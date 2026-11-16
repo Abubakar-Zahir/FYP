@@ -19,6 +19,7 @@ class TaskName(StrEnum):
     SCRIPTS_GENERATE = "scripts.generate"
     COMMENTS_SYNC = "comments.sync"
     HOOKS_SCORE = "hooks.score"
+    VIDEOS_EDIT = "videos.edit"
 
 
 TASK_QUEUES: dict[TaskName, Queue] = {
@@ -28,4 +29,5 @@ TASK_QUEUES: dict[TaskName, Queue] = {
     TaskName.SCRIPTS_GENERATE: Queue.AI,
     TaskName.COMMENTS_SYNC: Queue.AI,
     TaskName.HOOKS_SCORE: Queue.AI,
+    TaskName.VIDEOS_EDIT: Queue.VIDEO,
 }

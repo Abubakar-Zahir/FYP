@@ -15,6 +15,7 @@ TASK_MODULES = [
     "app.workers.dna_tasks",
     "app.workers.script_tasks",
     "app.workers.comment_tasks",
+    "app.workers.video_tasks",
 ]
 TOKEN_REFRESH_EVERY_S = 24 * 60 * 60
 # Hard limit kills a stuck task. The soft limit comes first so cleanup in `finally` can run.

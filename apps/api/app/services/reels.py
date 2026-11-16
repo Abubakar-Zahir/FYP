@@ -11,6 +11,7 @@ from app.core.pagination import Page, decode_cursor, encode_cursor
 from app.models.dna import DnaRecordRow
 from app.models.reel import Comment, CommentTheme, Reel, ReelSource
 from app.models.script import Script
+from app.models.video import Video
 from app.schemas.reels import ReelOut
 from app.schemas.uploads import EXTENSIONS, ReferenceUpload, ReferenceUploadRequest
 from app.services.storage import Storage, storage_not_configured
@@ -116,5 +117,10 @@ async def delete_reel(session: AsyncSession, storage: Storage | None, reel: Reel
 
 
 async def stored_keys(session: AsyncSession, user_id: UUID) -> list[str]:
-    query = select(Reel.r2_key).where(Reel.user_id == user_id, Reel.r2_key.is_not(None))
-    return [key for key in (await session.execute(query)).scalars() if key]
+    """Every file the user has in storage: reference reels and raw and edited videos."""
+    reels = select(Reel.r2_key).where(Reel.user_id == user_id, Reel.r2_key.is_not(None))
+    videos = select(Video.source_r2_key, Video.output_r2_key).where(Video.user_id == user_id)
+    keys = [key for key in (await session.execute(reels)).scalars() if key]
+    for source, output in (await session.execute(videos)).all():
+        keys += [key for key in (source, output) if key]
+    return keys

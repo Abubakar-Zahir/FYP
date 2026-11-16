@@ -17,10 +17,10 @@ WORKDIR /srv
 # Dependencies first, so code changes don't reinstall them.
 # The video worker builds with UV_GROUPS="--group video" to add Whisper and OpenCV.
 ARG UV_GROUPS=""
-# OpenCV, even the headless build, needs libxcb, which the slim image lacks.
+# OpenCV, even the headless build, needs libxcb. Auto-edit needs the ffmpeg binary.
 RUN case "$UV_GROUPS" in \
       *video*) apt-get update \
-        && apt-get install -y --no-install-recommends libxcb1 \
+        && apt-get install -y --no-install-recommends libxcb1 ffmpeg \
         && rm -rf /var/lib/apt/lists/* ;; \
     esac
 COPY pyproject.toml uv.lock .python-version ./

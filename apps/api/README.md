@@ -157,3 +157,12 @@ The worker builds the prompt from the template's structure, the creator's niche,
 3. Asks the LLM for a short name and a next-video idea per theme. Without an LLM, or if its answer is unreadable, it uses a plain fallback built from the comments themselves.
 
 `GET /api/v1/comments/summary` counts labelled comments by label over 30 days. `GET /api/v1/comments/themes` returns the themes, largest first. Disconnecting Instagram deletes the themes along with the comments.
+
+## Auto-edit
+
+1. `POST /api/v1/videos/upload-url {filename, content_type, size_bytes}` returns a presigned PUT, the same way reference reels upload.
+2. `POST /api/v1/videos/{id}/edit {caption_style, cut_silences, progress_bar, hook_overlay, hook_text?, roman_urdu_captions?}` starts `videos.edit` on the `video` queue.
+3. The worker downloads the video and gets word timings from Whisper. It cuts pauses longer than 0.6 s, writes word-level captions (`bold_pop`, `karaoke`, `minimal` or `boxed`, in Roman Urdu by default) and burns them in with one FFmpeg run. It can add a progress bar and the hook line, then uploads `edited.mp4` to R2.
+4. The job result, and `GET /api/v1/videos/{id}`, give `output_url` (valid for an hour), `duration_s` and `removed_silence_s`.
+
+The `ml/edit/` code holds the cut, caption, transliteration and render logic. The video worker image installs `ffmpeg`. Error codes: `video_too_long`, `video_unreadable`, `upload_missing`, `render_failed`.

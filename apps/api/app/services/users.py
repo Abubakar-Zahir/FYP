@@ -11,6 +11,7 @@ from app.models.llm_call import LlmCall
 from app.models.reel import Comment, CommentTheme, Reel
 from app.models.script import Script
 from app.models.user import User
+from app.models.video import Video
 from app.schemas.me import Profile
 from app.services import reels
 from app.services.storage import Storage, storage_not_configured
@@ -23,6 +24,7 @@ USER_OWNED_MODELS: tuple[
     | type[DnaRecordRow]
     | type[Reel]
     | type[InstagramAccount]
+    | type[Video]
     | type[Job],
     ...,
 ] = (
@@ -32,6 +34,7 @@ USER_OWNED_MODELS: tuple[
     DnaRecordRow,
     Reel,
     InstagramAccount,
+    Video,
     Job,
 )
 

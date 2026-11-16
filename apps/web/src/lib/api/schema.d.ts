@@ -386,6 +386,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/videos/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Video Upload
+         * @description Raw vertical footage up to 200 MB. The worker checks the 90 s limit.
+         */
+        post: operations["create_video_upload_api_v1_videos_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/videos/{video_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Video */
+        get: operations["read_video_api_v1_videos__video_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/videos/{video_id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit Video
+         * @description Poll the job. When done, its result holds `output_url`, `duration_s` and `removed_silence_s`.
+         */
+        post: operations["edit_video_api_v1_videos__video_id__edit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -416,6 +473,11 @@ export interface components {
             /** Start S */
             start_s: number;
         };
+        /**
+         * CaptionStyle
+         * @enum {string}
+         */
+        CaptionStyle: "bold_pop" | "karaoke" | "minimal" | "boxed";
         /**
          * CommentLabel
          * @description The 6 classes from docs/label-guideline.md and FR-7.2.
@@ -492,6 +554,23 @@ export interface components {
             title: string;
             /** Transcript */
             transcript: string;
+        };
+        /** EditRequest */
+        EditRequest: {
+            caption_style: components["schemas"]["CaptionStyle"];
+            /** Cut Silences */
+            cut_silences: boolean;
+            /** Hook Overlay */
+            hook_overlay: boolean;
+            /** Hook Text */
+            hook_text?: string | null;
+            /** Progress Bar */
+            progress_bar: boolean;
+            /**
+             * Roman Urdu Captions
+             * @default true
+             */
+            roman_urdu_captions: boolean;
         };
         /** GenerateScriptRequest */
         GenerateScriptRequest: {
@@ -805,6 +884,35 @@ export interface components {
          * @enum {string}
          */
         VideoContentType: "video/mp4" | "video/quicktime";
+        /** VideoOut */
+        VideoOut: {
+            /** Duration S */
+            duration_s: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Output Url */
+            output_url: string | null;
+            /** Removed Silence S */
+            removed_silence_s: number | null;
+            /** Title */
+            title: string;
+        };
+        /**
+         * VideoUpload
+         * @description PUT the file to `upload_url` with these headers, then call POST /videos/{id}/edit.
+         */
+        VideoUpload: {
+            /** Upload Headers */
+            upload_headers: {
+                [key: string]: string;
+            };
+            /** Upload Url */
+            upload_url: string;
+            video: components["schemas"]["VideoOut"];
+        };
     };
     responses: never;
     parameters: never;
@@ -1394,6 +1502,105 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScriptOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_video_upload_api_v1_videos_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferenceUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoUpload"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_video_api_v1_videos__video_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                video_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_video_api_v1_videos__video_id__edit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                video_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
                 };
             };
             /** @description Validation Error */

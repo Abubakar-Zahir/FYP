@@ -32,6 +32,8 @@ class Storage(Protocol):
 
     async def download_to(self, key: str, path: Path) -> None: ...
 
+    async def upload_file(self, path: Path, key: str, content_type: str) -> None: ...
+
     async def delete(self, keys: list[str]) -> None: ...
 
 
@@ -79,6 +81,11 @@ class R2Storage:
 
     async def download_to(self, key: str, path: Path) -> None:
         await asyncio.to_thread(self._client.download_file, self._bucket, key, str(path))
+
+    async def upload_file(self, path: Path, key: str, content_type: str) -> None:
+        await asyncio.to_thread(
+            self._client.upload_file, str(path), self._bucket, key, ExtraArgs={"ContentType": content_type}
+        )
 
     async def delete(self, keys: list[str]) -> None:
         for start in range(0, len(keys), DELETE_BATCH_SIZE):

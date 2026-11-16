@@ -65,6 +65,16 @@
         "title": "Beat",
         "type": "object"
       },
+      "CaptionStyle": {
+        "enum": [
+          "bold_pop",
+          "karaoke",
+          "minimal",
+          "boxed"
+        ],
+        "title": "CaptionStyle",
+        "type": "string"
+      },
       "CommentLabel": {
         "description": "The 6 classes from docs/label-guideline.md and FR-7.2.",
         "enum": [
@@ -246,6 +256,50 @@
           "model_version"
         ],
         "title": "DnaRecordOut",
+        "type": "object"
+      },
+      "EditRequest": {
+        "properties": {
+          "caption_style": {
+            "$ref": "#/components/schemas/CaptionStyle"
+          },
+          "cut_silences": {
+            "title": "Cut Silences",
+            "type": "boolean"
+          },
+          "hook_overlay": {
+            "title": "Hook Overlay",
+            "type": "boolean"
+          },
+          "hook_text": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hook Text"
+          },
+          "progress_bar": {
+            "title": "Progress Bar",
+            "type": "boolean"
+          },
+          "roman_urdu_captions": {
+            "default": true,
+            "title": "Roman Urdu Captions",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "caption_style",
+          "cut_silences",
+          "progress_bar",
+          "hook_overlay"
+        ],
+        "title": "EditRequest",
         "type": "object"
       },
       "GenerateScriptRequest": {
@@ -1146,6 +1200,87 @@
         ],
         "title": "VideoContentType",
         "type": "string"
+      },
+      "VideoOut": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "output_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Url"
+          },
+          "removed_silence_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Removed Silence S"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "output_url",
+          "duration_s",
+          "removed_silence_s"
+        ],
+        "title": "VideoOut",
+        "type": "object"
+      },
+      "VideoUpload": {
+        "description": "PUT the file to `upload_url` with these headers, then call POST /videos/{id}/edit.",
+        "properties": {
+          "upload_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Upload Headers",
+            "type": "object"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          },
+          "video": {
+            "$ref": "#/components/schemas/VideoOut"
+          }
+        },
+        "required": [
+          "video",
+          "upload_url",
+          "upload_headers"
+        ],
+        "title": "VideoUpload",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -2049,6 +2184,160 @@
         "summary": "Read Script",
         "tags": [
           "scripts"
+        ]
+      }
+    },
+    "/api/v1/videos/upload-url": {
+      "post": {
+        "description": "Raw vertical footage up to 200 MB. The worker checks the 90 s limit.",
+        "operationId": "create_video_upload_api_v1_videos_upload_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoUpload"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Video Upload",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}": {
+      "get": {
+        "operationId": "read_video_api_v1_videos__video_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Video",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}/edit": {
+      "post": {
+        "description": "Poll the job. When done, its result holds `output_url`, `duration_s` and `removed_silence_s`.",
+        "operationId": "edit_video_api_v1_videos__video_id__edit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Edit Video",
+        "tags": [
+          "videos"
         ]
       }
     }
