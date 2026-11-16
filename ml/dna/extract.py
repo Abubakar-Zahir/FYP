@@ -14,6 +14,7 @@ from scenedetect import ContentDetector, detect
 from ml.dna.errors import UnreadableVideo, VideoTooLong
 from ml.dna.schema import ReelSignals, TranscriptSegment
 from ml.dna.signals import cuts_per_window, hook_candidate
+from ml.edit.cuts import Word
 
 # PySceneDetect's default. It averages hue, saturation and brightness change, so a cut
 # between scenes of similar brightness can score under this and be missed.
@@ -98,6 +99,22 @@ class Extractor:
             TranscriptSegment(start_s=item.start, end_s=item.end, text=item.text) for item in segments
         ]
         return transcript, info.language
+
+    def words(self, path: Path) -> tuple[list[Word], float]:
+        """Word timings for auto-edit, and the video length. Rejects reels over the limit."""
+        length_s = video_length_s(path)
+        if length_s > self.options.max_length_s:
+            raise VideoTooLong(
+                f"The video is {length_s:.0f} s, over the {self.options.max_length_s:.0f} s limit"
+            )
+        segments, _ = self._model.transcribe(str(path), language=self.options.language, word_timestamps=True)
+        words = [
+            Word(start_s=float(word.start), end_s=float(word.end), text=word.word.strip())
+            for segment in segments
+            for word in (segment.words or [])
+            if word.word.strip()
+        ]
+        return words, length_s
 
     def extract(self, path: Path, keyframe_dir: Path) -> ReelSignals:
         length_s = video_length_s(path)
