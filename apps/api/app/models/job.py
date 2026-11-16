@@ -28,6 +28,8 @@ class Job(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     user_id: Mapped[UUID] = mapped_column(index=True)
     type: Mapped[str] = mapped_column(String(JOB_TYPE_MAX_LENGTH))
+    # What the job works on, such as the reel to analyse or the script to write.
+    subject_id: Mapped[UUID | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(String(JOB_STATUS_MAX_LENGTH), default=JobStatus.QUEUED)
     progress: Mapped[float] = mapped_column(Float, default=0.0)
     # Any: each job type stores its own result shape, validated by that type's schema.

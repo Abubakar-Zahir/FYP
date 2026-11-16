@@ -11,6 +11,7 @@ import cv2
 from faster_whisper import WhisperModel
 from scenedetect import ContentDetector, detect
 
+from ml.dna.errors import UnreadableVideo, VideoTooLong
 from ml.dna.schema import ReelSignals, TranscriptSegment
 from ml.dna.signals import cuts_per_window, hook_candidate
 
@@ -23,13 +24,7 @@ COMPUTE_TYPE = "int8"
 MAX_REEL_LENGTH_S = 90.0
 KEYFRAME_NAME = "scene_{index:03d}.jpg"
 
-
-class UnreadableVideo(ValueError):
-    pass
-
-
-class VideoTooLong(ValueError):
-    pass
+__all__ = ["Extractor", "ExtractOptions", "UnreadableVideo", "VideoTooLong"]
 
 
 @dataclass(frozen=True)

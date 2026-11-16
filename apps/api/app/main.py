@@ -5,6 +5,7 @@ import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.dna import router as dna_router
 from app.api.v1.health import router as health_router
 from app.api.v1.instagram import router as instagram_router
 from app.api.v1.jobs import router as jobs_router
@@ -57,6 +58,7 @@ def create_app(settings: Settings) -> FastAPI:
     application.include_router(jobs_router, prefix=API_PREFIX)
     application.include_router(instagram_router, prefix=API_PREFIX)
     application.include_router(reels_router, prefix=API_PREFIX)
+    application.include_router(dna_router, prefix=API_PREFIX)
     return application
 
 

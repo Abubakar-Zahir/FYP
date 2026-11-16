@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     r2_secret_key: SecretStr | None = None
     r2_bucket: str | None = None
 
+    # Whisper size for the DNA worker. P0-11 compares tiny and small on Urdu.
+    whisper_model: str = "small"
+    dna_cut_threshold: float = Field(default=27.0, gt=0)
+
     llm_provider: LlmProviderName | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None

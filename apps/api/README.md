@@ -120,3 +120,22 @@ Set `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY` and `R2_BUCKET`. The bucke
 ```json
 [{ "AllowedOrigins": ["http://localhost:3000", "https://your-app.vercel.app"], "AllowedMethods": ["PUT", "GET"], "AllowedHeaders": ["Content-Type"], "MaxAgeSeconds": 3600 }]
 ```
+
+## Format DNA
+
+`POST /api/v1/dna/analyse {reel_id}` starts a `dna.analyse` job on the `video` queue. It checks first that the video can be reached: the upload exists for a reference reel, or Instagram is connected for an own reel. The worker then:
+
+1. downloads the video to a temp folder (from R2, or from a fresh Instagram `media_url` for own reels),
+2. extracts signals with `ml/dna/extract.py` (Whisper, scene cuts), and rejects reels over 90 s,
+3. structures them with `ml/dna/structure.py` through the budget-guarded LLM client,
+4. saves one `dna_records` row per reel. Analysing again replaces it.
+
+The job result is `{"dna_id": ...}`. Error codes: `video_too_long`, `video_unreadable`, `upload_missing`, `llm_not_configured`, `llm_budget_exceeded`, `dna_structuring_failed`. `llm_unavailable` and `video_download_failed` are retried.
+
+| Endpoint | What it does |
+|---|---|
+| `GET /dna?limit&cursor&templates_only` | The DNA library, newest first |
+| `GET /dna/{id}` | One record with beats, overlays and transcript |
+| `POST /dna/{id}/save-template` | Marks it as a template for script generation |
+
+Keyframes are not kept yet, because nothing reads them until OCR or a vision model is wired. `WHISPER_MODEL` (default `small`) and `DNA_CUT_THRESHOLD` (default 27) tune the extractor.
