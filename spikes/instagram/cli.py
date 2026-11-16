@@ -5,74 +5,57 @@
 """Runs the Instagram spike against a real account. See README.md."""
 
 import argparse
-import os
-import secrets
 import time
 from pathlib import Path
 
 import httpx
-from ig_client import (
-    GraduationStrategy,
-    InstagramClient,
-    build_authorize_url,
-    exchange_code,
-    exchange_for_long_lived,
-)
+from ig_client import GraduationStrategy, InstagramClient
 
+# Written by hand from the README, never by this script, so the token is never printed.
 CREDENTIALS_FILE = Path(__file__).parent / ".env.instagram"
+TOKEN_KEY = "IG_ACCESS_TOKEN"  # noqa: S105
+USER_ID_KEY = "IG_USER_ID"
 HTTP_TIMEOUT_SECONDS = 60.0
 REELS_TO_IMPORT = 50
 
 
-def require_env(name: str) -> str:
-    value = os.environ.get(name)
+def load_credentials() -> dict[str, str]:
+    if not CREDENTIALS_FILE.exists():
+        raise SystemExit(f"No {CREDENTIALS_FILE.name} file. Create it as spikes/instagram/README.md shows.")
+    lines = CREDENTIALS_FILE.read_text(encoding="utf-8-sig").splitlines()
+    pairs = (line.split("=", 1) for line in lines if "=" in line)
+    return {key.strip(): value.strip() for key, value in pairs}
+
+
+def credential(credentials: dict[str, str], key: str) -> str:
+    value = credentials.get(key)
     if not value:
-        raise SystemExit(f"Set {name} first. See spikes/instagram/README.md.")
+        raise SystemExit(f"{key} is missing from {CREDENTIALS_FILE.name}.")
     return value
 
 
-def save_credentials(token: str, user_id: str) -> None:
-    CREDENTIALS_FILE.touch(mode=0o600)
-    CREDENTIALS_FILE.write_text(f"IG_ACCESS_TOKEN={token}\nIG_USER_ID={user_id}\n")
-
-
-def load_credentials() -> dict[str, str]:
-    if not CREDENTIALS_FILE.exists():
-        raise SystemExit("No saved token. Run the `login` and `exchange` commands first.")
-    lines = CREDENTIALS_FILE.read_text().splitlines()
-    return dict(line.split("=", 1) for line in lines if "=" in line)
-
-
 def client(http: httpx.Client) -> tuple[InstagramClient, str]:
+    """The client plus the Instagram account id that every call except `accounts` needs."""
     credentials = load_credentials()
-    return InstagramClient(http, credentials["IG_ACCESS_TOKEN"], time.sleep), credentials["IG_USER_ID"]
+    ig = InstagramClient(http, credential(credentials, TOKEN_KEY), time.sleep)
+    return ig, credential(credentials, USER_ID_KEY)
 
 
-def cmd_login(_: argparse.Namespace, __: httpx.Client) -> None:
-    state = secrets.token_urlsafe(16)
-    print(build_authorize_url(require_env("IG_APP_ID"), require_env("IG_REDIRECT_URI"), state))
-    print(f"\nOpen the URL, approve, then check that the redirect's state is: {state}")
-
-
-def cmd_exchange(args: argparse.Namespace, http: httpx.Client) -> None:
-    app_secret = require_env("IG_APP_SECRET")
-    short = exchange_code(
-        http, require_env("IG_APP_ID"), app_secret, require_env("IG_REDIRECT_URI"), args.code
-    )
-    long_lived = exchange_for_long_lived(http, app_secret, short.access_token)
-    save_credentials(long_lived.access_token, short.user_id)
-    print(f"Saved to {CREDENTIALS_FILE.name}. Token expires in {long_lived.expires_in // 86400} days.")
+def cmd_accounts(_: argparse.Namespace, http: httpx.Client) -> None:
+    token = credential(load_credentials(), TOKEN_KEY)
+    for account in InstagramClient(http, token, time.sleep).assigned_accounts():
+        print(account.model_dump())
 
 
 def cmd_account(_: argparse.Namespace, http: httpx.Client) -> None:
-    ig, _user_id = client(http)
-    print(ig.account().model_dump())
+    ig, user_id = client(http)
+    print(ig.account(user_id).model_dump())
 
 
 def cmd_import(_: argparse.Namespace, http: httpx.Client) -> None:
     """Prints counts and metric names only, so comments and captions stay out of terminal logs."""
-    ig, _user_id = client(http)
-    reels = ig.recent_reels(REELS_TO_IMPORT)
+    ig, user_id = client(http)
+    reels = ig.recent_reels(user_id, REELS_TO_IMPORT)
     print(f"Reels found: {len(reels)}")
     if not reels:
         return
@@ -101,10 +84,9 @@ def cmd_publish(args: argparse.Namespace, http: httpx.Client) -> None:
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     commands = root.add_subparsers(required=True)
-    commands.add_parser("login", help="print the authorization URL").set_defaults(run=cmd_login)
-    exchange = commands.add_parser("exchange", help="trade the code for a long-lived token")
-    exchange.add_argument("code")
-    exchange.set_defaults(run=cmd_exchange)
+    commands.add_parser("accounts", help="list the Instagram accounts the token may use").set_defaults(
+        run=cmd_accounts
+    )
     commands.add_parser("account", help="show the connected account").set_defaults(run=cmd_account)
     commands.add_parser("import", help="read reels, insights and comments").set_defaults(run=cmd_import)
     commands.add_parser("limit", help="show publishing quota").set_defaults(run=cmd_limit)

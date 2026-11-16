@@ -19,8 +19,8 @@ Status values: `todo`, `doing`, `blocked`, `done`.
 | P0-05 | Prototype: dashboard and DNA library and DNA detail | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-06 | Prototype: script studio and hook scores | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
 | P0-07 | Prototype: editor preview and variants and comments insights | Frontend | doing | On `main` (pushed directly, not reviewed). Needs teammate review |
-| P0-08 | Spike: Instagram OAuth and reel import | Backend | blocked | Code merged and unit tested. Needs a professional test account and the Meta app to run (see the hands-on plan) |
-| P0-09 | Spike: publish one Trial Reel via API | Backend | blocked | Code merged. Same account, plus a public clip URL. Fill the results table in `spikes/instagram/README.md` |
+| P0-08 | Spike: Instagram OAuth and reel import | Backend | done | Run on a real account with Unified Login on 2026-11-16: token, account, 21 reels, all metrics, comments. Creator login flow not run (spike uses a dashboard token). Awaiting review |
+| P0-09 | Spike: publish one Trial Reel via API | Backend | done | `MANUAL`, `SS_PERFORMANCE` and normal reel all published at 907 followers. Ineligible-account error still unknown. Results in `spikes/instagram/README.md`. Awaiting review |
 | P0-10 | Spike: DNA pipeline on 20 reels | ML video | blocked | Extraction (#5) and LLM structuring (#4) done in code. Needs the 20 reels and an LLM provider |
 | P0-11 | Spike: Whisper WER on Urdu and Roman Urdu | ML video | blocked | Script ready. Needs 30+ clips with human-typed transcripts |
 | P0-12 | Label guideline (6 classes) and Label Studio setup | ML NLP | done | Awaiting review. NLP owner to approve the guideline |
@@ -65,6 +65,7 @@ Later phases are listed in `roadmap.md`. Move tasks here when the phase starts.
 | 2026-11-16 | Video libraries in an optional `video` dependency group, one worker for the `video` queue | Keeps the API image small and protects the CPU |
 | 2026-11-16 | Web sign-in is client-side only (`@supabase/supabase-js`), no `@supabase/ssr` | Every API call is made from the browser, and the API checks the token |
 | 2026-11-16 | Phase 2 and 3 screens show "arrives in Phase N" outside mock mode | They have no endpoints yet |
+| 2026-11-16 | The Meta app uses the Instagram API with Unified Login (`graph.facebook.com`, business integration system user token), not Instagram Login | Meta no longer offers Instagram Login to new apps and calls Unified Login the recommended setup. The spike now uses it. `apps/api/app/services/instagram.py` still assumes Instagram Login and needs the same move (P1-03). Creators need a business portfolio |
 
 ## Blockers
 
@@ -89,3 +90,4 @@ Add one line per working session: date, who, what was done, what is next.
 | 2026-10-21 | Frontend | Landing page at `/` for pilot recruitment (editorial glass style, no fake stats or testimonials) | Feedback from creators, link pilot form |
 | 2026-11-16 | Claude | Phase 0 and 1 code as 13 stacked PRs (#2 to #14): jobs, LLM wrapper, DNA structuring and extractor, Instagram connect and import, R2 upload, DNA and script endpoints, generated web types, Supabase sign-in, real screens. 249 Python, 22 web unit and 12 Playwright tests pass | Review and merge in order. Then the hands-on work: accounts, data, labels, Gate 0 |
 | 2026-11-16 | Backend | Ran the full stack locally: web and API checks, 110 pytest, 10 Playwright, docker-compose and migrations all pass | Run Instagram spike on a real account, LLM structuring step, Gate 0 |
+| 2026-11-16 | T1 | Moved the Instagram spike to Unified Login and ran it on the test account: import works, both kinds of Trial Reel and a normal reel published. R2 bucket created | Backend: review the PR and plan P1-03 on Unified Login. Gate 0: share-winner and testers decisions |
