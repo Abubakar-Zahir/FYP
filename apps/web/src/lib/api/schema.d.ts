@@ -4,6 +4,60 @@
  */
 
 export interface paths {
+    "/api/v1/comments/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Summary */
+        get: operations["read_summary_api_v1_comments_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync Comments
+         * @description Classifies new comments and rebuilds themes. Run an Instagram import first to fetch new comments.
+         */
+        post: operations["sync_comments_api_v1_comments_sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/themes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Themes */
+        get: operations["read_themes_api_v1_comments_themes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dna": {
         parameters: {
             query?: never;
@@ -343,6 +397,41 @@ export interface components {
             start_s: number;
         };
         /**
+         * CommentLabel
+         * @description The 6 classes from docs/label-guideline.md and FR-7.2.
+         * @enum {string}
+         */
+        CommentLabel: "question" | "request" | "praise" | "objection" | "complaint" | "spam";
+        /**
+         * CommentSummaryOut
+         * @description Labelled comments in the period. Comments not yet classified are not counted.
+         */
+        CommentSummaryOut: {
+            /** By Label */
+            by_label: components["schemas"]["LabelCount"][];
+            /** Period Days */
+            period_days: number;
+            /** Total */
+            total: number;
+        };
+        /** CommentThemeOut */
+        CommentThemeOut: {
+            dominant_label: components["schemas"]["CommentLabel"];
+            /** Examples */
+            examples: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Idea */
+            idea: string;
+            /** Size */
+            size: number;
+            /** Theme */
+            theme: string;
+        };
+        /**
          * DnaRecordOut
          * @description What the DNA library and detail screens show. Field names match apps/web.
          */
@@ -483,6 +572,12 @@ export interface components {
          * @enum {string}
          */
         JobStatus: "queued" | "running" | "done" | "failed";
+        /** LabelCount */
+        LabelCount: {
+            /** Count */
+            count: number;
+            label: components["schemas"]["CommentLabel"];
+        };
         /**
          * Language
          * @enum {string}
@@ -508,6 +603,13 @@ export interface components {
             at_s: number;
             /** Text */
             text: string;
+        };
+        /** Page[CommentThemeOut] */
+        Page_CommentThemeOut_: {
+            /** Items */
+            items: components["schemas"]["CommentThemeOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
         };
         /** Page[DnaRecordOut] */
         Page_DnaRecordOut_: {
@@ -686,6 +788,66 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    read_summary_api_v1_comments_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentSummaryOut"];
+                };
+            };
+        };
+    };
+    sync_comments_api_v1_comments_sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+        };
+    };
+    read_themes_api_v1_comments_themes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CommentThemeOut_"];
+                };
+            };
+        };
+    };
     list_dna_api_v1_dna_get: {
         parameters: {
             query?: {

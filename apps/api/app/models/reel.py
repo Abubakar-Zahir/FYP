@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -12,6 +12,8 @@ SOURCE_MAX_LENGTH = 20
 TITLE_MAX_LENGTH = 200
 R2_KEY_MAX_LENGTH = 300
 COMMENT_ID_MAX_LENGTH = 64
+LABEL_MAX_LENGTH = 20
+MODEL_VERSION_MAX_LENGTH = 200
 
 
 class ReelSource(StrEnum):
@@ -58,3 +60,23 @@ class Comment(Base):
     ig_comment_id: Mapped[str] = mapped_column(String(COMMENT_ID_MAX_LENGTH))
     text: Mapped[str] = mapped_column(Text)
     posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Set by comments.sync. Null until classified. Every label keeps the model that made it.
+    label: Mapped[str | None] = mapped_column(String(LABEL_MAX_LENGTH), nullable=True)
+    label_model_version: Mapped[str | None] = mapped_column(String(MODEL_VERSION_MAX_LENGTH), nullable=True)
+
+
+class CommentTheme(Base):
+    """Themes from the latest comments.sync run. Each run replaces the user's previous themes."""
+
+    __tablename__ = "comment_themes"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(index=True)
+    theme: Mapped[str] = mapped_column(Text)
+    size: Mapped[int] = mapped_column(Integer)
+    dominant_label: Mapped[str] = mapped_column(String(LABEL_MAX_LENGTH))
+    # Any: a list of comment ids as strings, the most typical first.
+    example_comment_ids: Mapped[list[str]] = mapped_column(JSON)
+    idea: Mapped[str] = mapped_column(Text)
+    model_version: Mapped[str] = mapped_column(String(MODEL_VERSION_MAX_LENGTH))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
