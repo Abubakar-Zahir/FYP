@@ -61,3 +61,11 @@ uv run celery -A app.workers.celery_app worker --queues default,ai -l info
 ```
 
 Without `REDIS_URL`, endpoints that start jobs answer `503 jobs_not_configured`.
+
+## LLM calls
+
+Every LLM call goes through `app/services/llm.py`. `LlmClient.complete` checks this month's spend in `llm_calls` against `LLM_MONTHLY_BUDGET_USD` before calling, then records tokens and cost. Prompt and reply text are never stored or logged.
+
+`LLM_PROVIDER=openai_compatible` covers OpenRouter (`LLM_BASE_URL=https://openrouter.ai/api/v1`) and Gemini's OpenAI-compatible endpoint. Copy the per-million-token prices from the provider's price page into `LLM_INPUT_USD_PER_MILLION_TOKENS` and `LLM_OUTPUT_USD_PER_MILLION_TOKENS`. Without them the client refuses to start, because the budget guard can't work.
+
+Errors: `LlmUnavailable` (timeouts, 429, 5xx) is worth retrying. `LlmRequestRejected` and `LlmBadResponse` are not. `LlmBudgetExceeded` stops all calls until the next month.

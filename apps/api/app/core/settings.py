@@ -1,6 +1,15 @@
+from enum import StrEnum
 from functools import lru_cache
 
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+DEFAULT_LLM_MONTHLY_BUDGET_USD = 30.0
+
+
+class LlmProviderName(StrEnum):
+    # OpenRouter and Gemini both expose this API. A provider with its own API gets its own value.
+    OPENAI_COMPATIBLE = "openai_compatible"
 
 
 class Settings(BaseSettings):
@@ -14,6 +23,15 @@ class Settings(BaseSettings):
     database_url: str | None = None
     redis_url: str | None = None
     cors_origins: list[str] = ["http://localhost:3000"]
+
+    llm_provider: LlmProviderName | None = None
+    llm_base_url: str | None = None
+    llm_model: str | None = None
+    llm_api_key: SecretStr | None = None
+    llm_monthly_budget_usd: float = Field(default=DEFAULT_LLM_MONTHLY_BUDGET_USD, gt=0)
+    # From the provider's price page. Required, because the budget guard needs them.
+    llm_input_usd_per_million_tokens: float | None = Field(default=None, ge=0)
+    llm_output_usd_per_million_tokens: float | None = Field(default=None, ge=0)
 
     @property
     def supabase_issuer(self) -> str | None:
