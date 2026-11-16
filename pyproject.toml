@@ -16,6 +16,7 @@ dependencies = [
     "pydantic-settings>=2.5",
     "pyjwt[crypto]>=2.10",
     "scikit-learn>=1.5",
+    "sentry-sdk[celery,fastapi]>=2.20",
     "sqlalchemy[asyncio]>=2.0",
 ]
 
