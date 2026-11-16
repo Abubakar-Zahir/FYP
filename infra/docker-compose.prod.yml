@@ -1,7 +1,18 @@
-# Production stack on the VPS: API, Redis and Caddy (HTTPS). Postgres runs on Supabase.
-# Celery workers get added here when they exist (docs/backend.md, Deployment).
+# Production stack on the VPS: API, Celery workers, Redis and Caddy (HTTPS). Postgres runs on Supabase.
 #   docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod up -d --build
 services:
+  # Imports and LLM calls. Light on CPU, so a few at a time is fine.
+  worker:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "--workdir", "apps/api", "-A", "app.workers.celery_app", "worker", "--queues", "default,ai", "--concurrency", "4", "-l", "info"]
+    env_file: .env.prod
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+
   api:
     build:
       context: ..
