@@ -1,6 +1,6 @@
 # status.md
 
-Snapshot of what is done and what is left, taken from the code on `main` on 2026-11-11. `progress.md` is still the official tracker, and it is behind this file. See "progress.md is stale" at the end.
+Snapshot taken from `main` on 2026-11-11. **Superseded on 2026-11-16:** the Phase 0 and 1 code is in PRs #2 to #14, and `progress.md` is up to date again. Use `progress.md`.
 
 ## What we are building
 
