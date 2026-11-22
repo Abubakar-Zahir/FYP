@@ -14,6 +14,7 @@ from app.models.reel import Reel, ReelSource
 from app.models.script import Script
 from app.schemas.scripts import GenerateResult
 from app.services import llm, users
+from app.services.hook_scoring import load_scorer, scored_hooks
 from app.workers.runner import JobContext, JobFailure, JobHandler, TransientJobError
 from ml.dna.schema import DnaRecord
 from ml.scripts.generate import (
@@ -24,7 +25,8 @@ from ml.scripts.generate import (
     ScriptPrompt,
     generate,
 )
-from ml.scripts.schema import MAX_VOICE_SAMPLES, CreatorVoice, ScriptLanguage, ScriptRequest
+from ml.scripts.schema import CreatorVoice, ScriptLanguage, ScriptRequest
+from ml.scripts.voice import pick_samples
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +34,27 @@ PURPOSE = "scripts.generate"
 HttpFactory = Callable[[], httpx.AsyncClient]
 
 
-async def recent_captions(session: AsyncSession, user_id: UUID) -> list[str]:
-    """The creator's latest captions, as examples of how they write (voice matching v0)."""
-    query = (
+VOICE_CANDIDATES = 300
+
+
+async def voice_samples(session: AsyncSession, user_id: UUID, query: str) -> list[str]:
+    """The creator's own captions and spoken transcripts closest to the brief (ml/scripts/voice.py)."""
+    captions = (
         select(Reel.caption)
         .where(Reel.user_id == user_id, Reel.source == ReelSource.OWN, Reel.caption.is_not(None))
         .order_by(Reel.posted_at.desc())
-        .limit(MAX_VOICE_SAMPLES)
+        .limit(VOICE_CANDIDATES)
     )
-    return [caption for caption in (await session.execute(query)).scalars() if caption and caption.strip()]
+    transcripts = (
+        select(DnaRecordRow.transcript)
+        .join(Reel, Reel.id == DnaRecordRow.reel_id)
+        .where(Reel.user_id == user_id, Reel.source == ReelSource.OWN)
+        .order_by(Reel.posted_at.desc())
+        .limit(VOICE_CANDIDATES)
+    )
+    samples = [text for text in (await session.execute(captions)).scalars() if text]
+    samples += [text for text in (await session.execute(transcripts)).scalars() if text]
+    return pick_samples(query, samples)
 
 
 def _caller(client: llm.LlmClient, user_id: UUID) -> CallLlm:
@@ -69,7 +83,9 @@ async def _request(session: AsyncSession, script: Script) -> ScriptRequest:
             niche=user.niche,
             tone=user.tone,
             goals=user.goals,
-            sample_captions=await recent_captions(session, script.user_id),
+            sample_captions=await voice_samples(
+                session, script.user_id, f"{script.topic} {template.hook_text}"
+            ),
         ),
         templates=[DnaRecord.model_validate(template.record)],
     )
@@ -94,7 +110,8 @@ async def _generate(context: JobContext, http_factory: HttpFactory) -> GenerateR
         except (llm.LlmRequestRejected, llm.LlmBadResponse, ScriptGenerationError) as error:
             logger.warning("Script generation failed: %s", type(error).__name__)
             raise JobFailure("script_generation_failed") from error
-    script.hooks = [{"text": hook.text, "score": None, "top_factors": []} for hook in draft.hooks]
+    scorer = load_scorer(context.settings)
+    script.hooks = scored_hooks(scorer, [hook.text for hook in draft.hooks], request.templates[0].hook_type)
     script.angles = [angle.model_dump() for angle in draft.angles]
     script.body = [beat.model_dump() for beat in draft.body]
     script.model_version = draft.model_version

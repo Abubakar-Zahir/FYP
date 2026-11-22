@@ -2,11 +2,16 @@
 
 import { FileChartColumn, Lightbulb, MessagesSquare, PenLine, TrendingDown, TrendingUp, type LucideIcon } from "lucide-react";
 
-import { useWeeklyReport } from "@/lib/api/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+import { ApiRequestError } from "@/lib/api/client";
+import { queryKeys, useBuildWeeklyReport, useJob, useWeeklyReport } from "@/lib/api/hooks";
 import type { WeeklyReport } from "@/lib/api/types";
 import { cn, formatShortDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { JobProgress } from "@/components/ui/job-progress";
 import { CardHeader, GlassCard } from "@/components/ui/card";
 import { EmptyState, LoadingBlock, QueryState } from "@/components/ui/states";
 
@@ -82,19 +87,47 @@ function ReportBody({ report }: { report: WeeklyReport }) {
   );
 }
 
+function BuildReport() {
+  const queryClient = useQueryClient();
+  const build = useBuildWeeklyReport();
+  const job = useJob(build.data?.job_id ?? null);
+  const done = job.data?.status === "done";
+
+  useEffect(() => {
+    if (done) void queryClient.invalidateQueries({ queryKey: queryKeys.weeklyReport });
+  }, [done, queryClient]);
+
+  if (build.data) {
+    return <JobProgress label="Building this week's report" job={job.data} requestError={job.error} onRetry={() => build.mutate()} />;
+  }
+  return (
+    <Button variant="secondary" onClick={() => build.mutate()} disabled={build.isPending}>
+      Build it now
+    </Button>
+  );
+}
+
+const FIRST_REPORT = (
+  <GlassCard>
+    <EmptyState
+      icon={FileChartColumn}
+      title="Your first report arrives Monday"
+      description="It compares the week's reels with your usual views and turns comment themes into ideas."
+      action={<BuildReport />}
+    />
+  </GlassCard>
+);
+
 export function WeeklyReportView() {
   const report = useWeeklyReport();
+  if (report.error instanceof ApiRequestError && report.error.code === "report_not_ready") return FIRST_REPORT;
 
   return (
     <QueryState
       query={report}
       loading={<GlassCard><LoadingBlock label="Loading weekly report" /></GlassCard>}
       isEmpty={(data) => data.wins.length === 0 && data.losses.length === 0 && data.ideas.length === 0}
-      empty={
-        <GlassCard>
-          <EmptyState icon={FileChartColumn} title="Your first report arrives Monday" description="We need one full week of posts and insights to write it." />
-        </GlassCard>
-      }
+      empty={FIRST_REPORT}
     >
       {(data) => <ReportBody report={data} />}
     </QueryState>

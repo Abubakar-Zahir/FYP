@@ -32,6 +32,8 @@ class Job(Base):
     subject_id: Mapped[UUID | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(String(JOB_STATUS_MAX_LENGTH), default=JobStatus.QUEUED)
     progress: Mapped[float] = mapped_column(Float, default=0.0)
+    # Any: the job's input when it needs more than subject_id, validated by the job's handler.
+    payload: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     # Any: each job type stores its own result shape, validated by that type's schema.
     result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     # A stable error code, never a raw exception message, which can hold user data.

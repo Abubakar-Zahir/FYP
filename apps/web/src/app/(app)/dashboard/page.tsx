@@ -6,7 +6,6 @@ import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RecentReels } from "@/components/dashboard/recent-reels";
 import { ViewsTrend } from "@/components/dashboard/views-trend";
 import { PageHeader } from "@/components/ui/page-header";
-import { PlannedFeature } from "@/components/ui/planned-feature";
 
 export const metadata: Metadata = { title: "Dashboard · Reelmind" };
 
@@ -15,13 +14,11 @@ export default function DashboardPage() {
     <>
       <PageHeader eyebrow="Last 30 days" title="Dashboard" description="How your reels are doing and what to make next." actions={<QuickActions />} />
       <div className="space-y-4">
-        <PlannedFeature phase="Phase 3" title="Account analytics">
-          <OverviewStats />
-          <div className="grid gap-4 xl:grid-cols-3">
-            <ViewsTrend className="xl:col-span-2" />
-            <BestFormats />
-          </div>
-        </PlannedFeature>
+        <OverviewStats />
+        <div className="grid gap-4 xl:grid-cols-3">
+          <ViewsTrend className="xl:col-span-2" />
+          <BestFormats />
+        </div>
         <RecentReels />
       </div>
     </>

@@ -5,25 +5,48 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.dna import DnaRecordRow
+from app.models.experiment import BanditBelief, Experiment, Variant, VariantInsight
 from app.models.instagram_account import InstagramAccount
 from app.models.job import Job
 from app.models.llm_call import LlmCall
-from app.models.reel import Comment, Reel
+from app.models.reel import Comment, CommentTheme, Reel
+from app.models.report import WeeklyReport
 from app.models.script import Script
 from app.models.user import User
+from app.models.video import Video
 from app.schemas.me import Profile
 from app.services import reels
 from app.services.storage import Storage, storage_not_configured
 
 # Every table with a user_id, children before parents. A new user-owned table must be added here.
 USER_OWNED_MODELS: tuple[
-    type[Comment] | type[Script] | type[DnaRecordRow] | type[Reel] | type[InstagramAccount] | type[Job], ...
+    type[WeeklyReport]
+    | type[VariantInsight]
+    | type[Variant]
+    | type[Experiment]
+    | type[BanditBelief]
+    | type[Comment]
+    | type[CommentTheme]
+    | type[Script]
+    | type[DnaRecordRow]
+    | type[Reel]
+    | type[InstagramAccount]
+    | type[Video]
+    | type[Job],
+    ...,
 ] = (
+    WeeklyReport,
+    VariantInsight,
+    Variant,
+    Experiment,
+    BanditBelief,
     Comment,
+    CommentTheme,
     Script,
     DnaRecordRow,
     Reel,
     InstagramAccount,
+    Video,
     Job,
 )
 

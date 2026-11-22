@@ -15,6 +15,44 @@
         "title": "AnalyseRequest",
         "type": "object"
       },
+      "AnalyticsOverview": {
+        "description": "Field names match apps/web. `change` is the fraction up or down on the previous period.",
+        "properties": {
+          "best_formats": {
+            "items": {
+              "$ref": "#/components/schemas/FormatPerformance"
+            },
+            "title": "Best Formats",
+            "type": "array"
+          },
+          "change": {
+            "$ref": "#/components/schemas/Totals"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Totals"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "title": "Trend",
+            "type": "array"
+          }
+        },
+        "required": [
+          "period_days",
+          "totals",
+          "change",
+          "trend",
+          "best_formats"
+        ],
+        "title": "AnalyticsOverview",
+        "type": "object"
+      },
       "Angle": {
         "properties": {
           "summary": {
@@ -63,6 +101,184 @@
           "description"
         ],
         "title": "Beat",
+        "type": "object"
+      },
+      "CaptionStyle": {
+        "enum": [
+          "bold_pop",
+          "karaoke",
+          "minimal",
+          "boxed"
+        ],
+        "title": "CaptionStyle",
+        "type": "string"
+      },
+      "CommentLabel": {
+        "description": "The 6 classes from docs/label-guideline.md and FR-7.2.",
+        "enum": [
+          "question",
+          "request",
+          "praise",
+          "objection",
+          "complaint",
+          "spam"
+        ],
+        "title": "CommentLabel",
+        "type": "string"
+      },
+      "CommentSummaryOut": {
+        "description": "Labelled comments in the period. Comments not yet classified are not counted.",
+        "properties": {
+          "by_label": {
+            "items": {
+              "$ref": "#/components/schemas/LabelCount"
+            },
+            "title": "By Label",
+            "type": "array"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "period_days",
+          "by_label"
+        ],
+        "title": "CommentSummaryOut",
+        "type": "object"
+      },
+      "CommentThemeOut": {
+        "properties": {
+          "dominant_label": {
+            "$ref": "#/components/schemas/CommentLabel"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "idea": {
+            "title": "Idea",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "theme",
+          "size",
+          "dominant_label",
+          "examples",
+          "idea"
+        ],
+        "title": "CommentThemeOut",
+        "type": "object"
+      },
+      "CreateExperimentRequest": {
+        "properties": {
+          "script_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Script Id"
+          },
+          "variant_count": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 3.0,
+            "title": "Variant Count",
+            "type": "integer"
+          },
+          "video_id": {
+            "format": "uuid",
+            "title": "Video Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "video_id"
+        ],
+        "title": "CreateExperimentRequest",
+        "type": "object"
+      },
+      "DnaClusterOut": {
+        "description": "One format group. Null outlier when none of its reels has one (reference reels).",
+        "properties": {
+          "dna_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Dna Ids",
+            "type": "array"
+          },
+          "hook_type": {
+            "$ref": "#/components/schemas/HookType"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "median_length_s": {
+            "title": "Median Length S",
+            "type": "number"
+          },
+          "median_outlier": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Outlier"
+          },
+          "median_pacing_cuts_per_10s": {
+            "title": "Median Pacing Cuts Per 10S",
+            "type": "number"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "size",
+          "hook_type",
+          "median_pacing_cuts_per_10s",
+          "median_length_s",
+          "median_outlier",
+          "dna_ids"
+        ],
+        "title": "DnaClusterOut",
         "type": "object"
       },
       "DnaRecordOut": {
@@ -167,6 +383,144 @@
         "title": "DnaRecordOut",
         "type": "object"
       },
+      "EditRequest": {
+        "properties": {
+          "caption_style": {
+            "$ref": "#/components/schemas/CaptionStyle"
+          },
+          "cut_silences": {
+            "title": "Cut Silences",
+            "type": "boolean"
+          },
+          "hook_overlay": {
+            "title": "Hook Overlay",
+            "type": "boolean"
+          },
+          "hook_text": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hook Text"
+          },
+          "progress_bar": {
+            "title": "Progress Bar",
+            "type": "boolean"
+          },
+          "roman_urdu_captions": {
+            "default": true,
+            "title": "Roman Urdu Captions",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "caption_style",
+          "cut_silences",
+          "progress_bar",
+          "hook_overlay"
+        ],
+        "title": "EditRequest",
+        "type": "object"
+      },
+      "ExperimentOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "share_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Instructions"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExperimentStatus"
+          },
+          "strategy": {
+            "const": "thompson_sampling",
+            "title": "Strategy",
+            "type": "string"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantOut"
+            },
+            "title": "Variants",
+            "type": "array"
+          },
+          "video_title": {
+            "title": "Video Title",
+            "type": "string"
+          },
+          "winner_variant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Winner Variant Id"
+          }
+        },
+        "required": [
+          "id",
+          "video_title",
+          "strategy",
+          "status",
+          "winner_variant_id",
+          "share_instructions",
+          "variants"
+        ],
+        "title": "ExperimentOut",
+        "type": "object"
+      },
+      "ExperimentStatus": {
+        "enum": [
+          "draft",
+          "publishing",
+          "live",
+          "done"
+        ],
+        "title": "ExperimentStatus",
+        "type": "string"
+      },
+      "FormatPerformance": {
+        "properties": {
+          "hook_type": {
+            "$ref": "#/components/schemas/HookType"
+          },
+          "median_outlier": {
+            "title": "Median Outlier",
+            "type": "number"
+          },
+          "reels": {
+            "title": "Reels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "hook_type",
+          "reels",
+          "median_outlier"
+        ],
+        "title": "FormatPerformance",
+        "type": "object"
+      },
       "GenerateScriptRequest": {
         "properties": {
           "language": {
@@ -223,6 +577,34 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "HookScoreRequest": {
+        "properties": {
+          "hook_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HookType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hooks": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Hooks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hooks"
+        ],
+        "title": "HookScoreRequest",
+        "type": "object"
+      },
       "HookType": {
         "enum": [
           "question",
@@ -233,6 +615,32 @@
           "other"
         ],
         "title": "HookType",
+        "type": "string"
+      },
+      "Idea": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "why"
+        ],
+        "title": "Idea",
+        "type": "object"
+      },
+      "InsightWindow": {
+        "enum": [
+          "24h",
+          "72h"
+        ],
+        "title": "InsightWindow",
         "type": "string"
       },
       "InstagramAccountOut": {
@@ -320,6 +728,24 @@
         "title": "InstagramConnected",
         "type": "object"
       },
+      "Item": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "detail"
+        ],
+        "title": "Item",
+        "type": "object"
+      },
       "JobAccepted": {
         "description": "The 202 body for every endpoint that starts long work (rules.md 3b.2).",
         "properties": {
@@ -399,6 +825,23 @@
         ],
         "title": "JobStatus",
         "type": "string"
+      },
+      "LabelCount": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label": {
+            "$ref": "#/components/schemas/CommentLabel"
+          }
+        },
+        "required": [
+          "label",
+          "count"
+        ],
+        "title": "LabelCount",
+        "type": "object"
       },
       "Language": {
         "enum": [
@@ -488,6 +931,34 @@
         "title": "Overlay",
         "type": "object"
       },
+      "Page_CommentThemeOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CommentThemeOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[CommentThemeOut]",
+        "type": "object"
+      },
       "Page_DnaRecordOut_": {
         "properties": {
           "items": {
@@ -514,6 +985,34 @@
           "next_cursor"
         ],
         "title": "Page[DnaRecordOut]",
+        "type": "object"
+      },
+      "Page_ExperimentOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[ExperimentOut]",
         "type": "object"
       },
       "Page_ReelOut_": {
@@ -945,6 +1444,57 @@
         "title": "ScriptOut",
         "type": "object"
       },
+      "Totals": {
+        "properties": {
+          "avg_watch_time_s": {
+            "title": "Avg Watch Time S",
+            "type": "number"
+          },
+          "reach": {
+            "title": "Reach",
+            "type": "number"
+          },
+          "saves": {
+            "title": "Saves",
+            "type": "number"
+          },
+          "shares": {
+            "title": "Shares",
+            "type": "number"
+          },
+          "views": {
+            "title": "Views",
+            "type": "number"
+          }
+        },
+        "required": [
+          "views",
+          "reach",
+          "saves",
+          "shares",
+          "avg_watch_time_s"
+        ],
+        "title": "Totals",
+        "type": "object"
+      },
+      "TrendPoint": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "views": {
+            "title": "Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "views"
+        ],
+        "title": "TrendPoint",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -985,6 +1535,157 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VariantInsightOut": {
+        "properties": {
+          "reach": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reach"
+          },
+          "saves": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saves"
+          },
+          "shares": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shares"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          },
+          "window": {
+            "$ref": "#/components/schemas/InsightWindow"
+          }
+        },
+        "required": [
+          "window",
+          "views",
+          "reach",
+          "saves",
+          "shares"
+        ],
+        "title": "VariantInsightOut",
+        "type": "object"
+      },
+      "VariantOut": {
+        "description": "Field names match apps/web.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "hook_line": {
+            "title": "Hook Line",
+            "type": "string"
+          },
+          "hook_style": {
+            "title": "Hook Style",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "insights": {
+            "items": {
+              "$ref": "#/components/schemas/VariantInsightOut"
+            },
+            "title": "Insights",
+            "type": "array"
+          },
+          "is_trial": {
+            "title": "Is Trial",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "opener": {
+            "title": "Opener",
+            "type": "string"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VariantStatus"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "hook_line",
+          "hook_style",
+          "opener",
+          "caption",
+          "is_trial",
+          "status",
+          "permalink",
+          "error",
+          "insights"
+        ],
+        "title": "VariantOut",
+        "type": "object"
+      },
+      "VariantStatus": {
+        "enum": [
+          "draft",
+          "publishing",
+          "live",
+          "failed"
+        ],
+        "title": "VariantStatus",
+        "type": "string"
+      },
       "VideoContentType": {
         "enum": [
           "video/mp4",
@@ -992,6 +1693,138 @@
         ],
         "title": "VideoContentType",
         "type": "string"
+      },
+      "VideoOut": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "output_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Url"
+          },
+          "removed_silence_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Removed Silence S"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "output_url",
+          "duration_s",
+          "removed_silence_s"
+        ],
+        "title": "VideoOut",
+        "type": "object"
+      },
+      "VideoUpload": {
+        "description": "PUT the file to `upload_url` with these headers, then call POST /videos/{id}/edit.",
+        "properties": {
+          "upload_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Upload Headers",
+            "type": "object"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          },
+          "video": {
+            "$ref": "#/components/schemas/VideoOut"
+          }
+        },
+        "required": [
+          "video",
+          "upload_url",
+          "upload_headers"
+        ],
+        "title": "VideoUpload",
+        "type": "object"
+      },
+      "WeeklyReportContent": {
+        "description": "Field names match apps/web.",
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "ideas": {
+            "items": {
+              "$ref": "#/components/schemas/Idea"
+            },
+            "title": "Ideas",
+            "type": "array"
+          },
+          "losses": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "title": "Losses",
+            "type": "array"
+          },
+          "themes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "week_start": {
+            "title": "Week Start",
+            "type": "string"
+          },
+          "wins": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "title": "Wins",
+            "type": "array"
+          }
+        },
+        "required": [
+          "week_start",
+          "headline",
+          "wins",
+          "losses",
+          "themes",
+          "ideas"
+        ],
+        "title": "WeeklyReportContent",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1007,6 +1840,112 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/analytics/overview": {
+      "get": {
+        "description": "The last 30 days against the 30 before, from imported reels.",
+        "operationId": "read_overview_api_v1_analytics_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Overview",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/comments/summary": {
+      "get": {
+        "operationId": "read_summary_api_v1_comments_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Summary",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/comments/sync": {
+      "post": {
+        "description": "Classifies new comments and rebuilds themes. Run an Instagram import first to fetch new comments.",
+        "operationId": "sync_comments_api_v1_comments_sync_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Sync Comments",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/comments/themes": {
+      "get": {
+        "operationId": "read_themes_api_v1_comments_themes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CommentThemeOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Themes",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
     "/api/v1/dna": {
       "get": {
         "operationId": "list_dna_api_v1_dna_get",
@@ -1131,6 +2070,37 @@
         ]
       }
     },
+    "/api/v1/dna/clusters": {
+      "get": {
+        "description": "Format groups across the creator's analysed reels. Empty with fewer than 6 records.",
+        "operationId": "read_clusters_api_v1_dna_clusters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DnaClusterOut"
+                  },
+                  "title": "Response Read Clusters Api V1 Dna Clusters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Clusters",
+        "tags": [
+          "dna"
+        ]
+      }
+    },
     "/api/v1/dna/{dna_id}": {
       "get": {
         "operationId": "read_dna_api_v1_dna__dna_id__get",
@@ -1228,6 +2198,264 @@
         ]
       }
     },
+    "/api/v1/experiments": {
+      "get": {
+        "operationId": "list_experiments_api_v1_experiments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ExperimentOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Experiments",
+        "tags": [
+          "experiments"
+        ]
+      },
+      "post": {
+        "description": "Writes candidate variants and lets the variant learner pick which to test. Result: `experiment_id`.",
+        "operationId": "create_experiment_api_v1_experiments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExperimentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Experiment",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
+    "/api/v1/experiments/{experiment_id}": {
+      "get": {
+        "operationId": "read_experiment_api_v1_experiments__experiment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Experiment",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
+    "/api/v1/experiments/{experiment_id}/publish": {
+      "post": {
+        "description": "Publishes the draft variants as Trial Reels. Insights arrive at 24 h and 72 h.",
+        "operationId": "publish_experiment_api_v1_experiments__experiment_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Experiment",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
+    "/api/v1/experiments/{experiment_id}/share-winner": {
+      "post": {
+        "description": "Instagram's API can't share a Trial Reel with followers (open decision 1 in status.md).\nThis records the request, and `share_instructions` tells the creator how to do it in the app.",
+        "operationId": "share_winner_api_v1_experiments__experiment_id__share_winner_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Share Winner",
+        "tags": [
+          "experiments"
+        ]
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "read_health_api_v1_health_get",
@@ -1246,6 +2474,54 @@
         "summary": "Read Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/hooks/score": {
+      "post": {
+        "description": "Scores up to 10 hooks. The job result holds `hooks` in the ScoredHook shape and `model_version`.",
+        "operationId": "score_hooks_api_v1_hooks_score_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HookScoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Score Hooks",
+        "tags": [
+          "scripts",
+          "hooks"
         ]
       }
     },
@@ -1676,6 +2952,57 @@
         ]
       }
     },
+    "/api/v1/reports/weekly": {
+      "get": {
+        "description": "The latest report. A new one is built every Monday, or on request.",
+        "operationId": "read_weekly_report_api_v1_reports_weekly_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyReportContent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Weekly Report",
+        "tags": [
+          "analytics"
+        ]
+      },
+      "post": {
+        "operationId": "build_weekly_report_api_v1_reports_weekly_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Build Weekly Report",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
     "/api/v1/scripts/generate": {
       "post": {
         "description": "Poll the job. When done, its result holds `script_id`.",
@@ -1768,6 +3095,160 @@
         "summary": "Read Script",
         "tags": [
           "scripts"
+        ]
+      }
+    },
+    "/api/v1/videos/upload-url": {
+      "post": {
+        "description": "Raw vertical footage up to 200 MB. The worker checks the 90 s limit.",
+        "operationId": "create_video_upload_api_v1_videos_upload_url_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoUpload"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Video Upload",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}": {
+      "get": {
+        "operationId": "read_video_api_v1_videos__video_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Video",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}/edit": {
+      "post": {
+        "description": "Poll the job. When done, its result holds `output_url`, `duration_s` and `removed_silence_s`.",
+        "operationId": "edit_video_api_v1_videos__video_id__edit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Edit Video",
+        "tags": [
+          "videos"
         ]
       }
     }

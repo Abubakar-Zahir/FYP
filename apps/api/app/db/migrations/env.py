@@ -3,7 +3,18 @@ import asyncio
 from alembic import context
 from app.core.settings import get_settings
 from app.db.base import Base
-from app.models import dna, instagram_account, job, llm_call, reel, script, user  # noqa: F401  (registers the tables on Base.metadata)
+from app.models import (  # noqa: F401  (registers the tables on Base.metadata)
+    dna,
+    experiment,
+    instagram_account,
+    job,
+    llm_call,
+    reel,
+    report,
+    script,
+    user,
+    video,
+)
 from sqlalchemy import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 

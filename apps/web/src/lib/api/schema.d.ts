@@ -4,6 +4,80 @@
  */
 
 export interface paths {
+    "/api/v1/analytics/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Overview
+         * @description The last 30 days against the 30 before, from imported reels.
+         */
+        get: operations["read_overview_api_v1_analytics_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Summary */
+        get: operations["read_summary_api_v1_comments_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync Comments
+         * @description Classifies new comments and rebuilds themes. Run an Instagram import first to fetch new comments.
+         */
+        post: operations["sync_comments_api_v1_comments_sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/themes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Themes */
+        get: operations["read_themes_api_v1_comments_themes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dna": {
         parameters: {
             query?: never;
@@ -35,6 +109,26 @@ export interface paths {
          * @description Poll the job. When done, its result holds `dna_id`.
          */
         post: operations["analyse_api_v1_dna_analyse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dna/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Clusters
+         * @description Format groups across the creator's analysed reels. Empty with fewer than 6 records.
+         */
+        get: operations["read_clusters_api_v1_dna_clusters_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -78,6 +172,85 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/experiments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Experiments */
+        get: operations["list_experiments_api_v1_experiments_get"];
+        put?: never;
+        /**
+         * Create Experiment
+         * @description Writes candidate variants and lets the variant learner pick which to test. Result: `experiment_id`.
+         */
+        post: operations["create_experiment_api_v1_experiments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiments/{experiment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Experiment */
+        get: operations["read_experiment_api_v1_experiments__experiment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiments/{experiment_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Experiment
+         * @description Publishes the draft variants as Trial Reels. Insights arrive at 24 h and 72 h.
+         */
+        post: operations["publish_experiment_api_v1_experiments__experiment_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiments/{experiment_id}/share-winner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Share Winner
+         * @description Instagram's API can't share a Trial Reel with followers (open decision 1 in status.md).
+         *     This records the request, and `share_instructions` tells the creator how to do it in the app.
+         */
+        post: operations["share_winner_api_v1_experiments__experiment_id__share_winner_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -89,6 +262,26 @@ export interface paths {
         get: operations["read_health_api_v1_health_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hooks/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Score Hooks
+         * @description Scores up to 10 hooks. The job result holds `hooks` in the ScoredHook shape and `model_version`.
+         */
+        post: operations["score_hooks_api_v1_hooks_score_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -275,6 +468,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/weekly": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Weekly Report
+         * @description The latest report. A new one is built every Monday, or on request.
+         */
+        get: operations["read_weekly_report_api_v1_reports_weekly_get"];
+        put?: never;
+        /** Build Weekly Report */
+        post: operations["build_weekly_report_api_v1_reports_weekly_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/scripts/generate": {
         parameters: {
             query?: never;
@@ -312,6 +526,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/videos/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Video Upload
+         * @description Raw vertical footage up to 200 MB. The worker checks the 90 s limit.
+         */
+        post: operations["create_video_upload_api_v1_videos_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/videos/{video_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Video */
+        get: operations["read_video_api_v1_videos__video_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/videos/{video_id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit Video
+         * @description Poll the job. When done, its result holds `output_url`, `duration_s` and `removed_silence_s`.
+         */
+        post: operations["edit_video_api_v1_videos__video_id__edit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -323,6 +594,20 @@ export interface components {
              * Format: uuid
              */
             reel_id: string;
+        };
+        /**
+         * AnalyticsOverview
+         * @description Field names match apps/web. `change` is the fraction up or down on the previous period.
+         */
+        AnalyticsOverview: {
+            /** Best Formats */
+            best_formats: components["schemas"]["FormatPerformance"][];
+            change: components["schemas"]["Totals"];
+            /** Period Days */
+            period_days: number;
+            totals: components["schemas"]["Totals"];
+            /** Trend */
+            trend: components["schemas"]["TrendPoint"][];
         };
         /** Angle */
         Angle: {
@@ -341,6 +626,80 @@ export interface components {
             label: string;
             /** Start S */
             start_s: number;
+        };
+        /**
+         * CaptionStyle
+         * @enum {string}
+         */
+        CaptionStyle: "bold_pop" | "karaoke" | "minimal" | "boxed";
+        /**
+         * CommentLabel
+         * @description The 6 classes from docs/label-guideline.md and FR-7.2.
+         * @enum {string}
+         */
+        CommentLabel: "question" | "request" | "praise" | "objection" | "complaint" | "spam";
+        /**
+         * CommentSummaryOut
+         * @description Labelled comments in the period. Comments not yet classified are not counted.
+         */
+        CommentSummaryOut: {
+            /** By Label */
+            by_label: components["schemas"]["LabelCount"][];
+            /** Period Days */
+            period_days: number;
+            /** Total */
+            total: number;
+        };
+        /** CommentThemeOut */
+        CommentThemeOut: {
+            dominant_label: components["schemas"]["CommentLabel"];
+            /** Examples */
+            examples: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Idea */
+            idea: string;
+            /** Size */
+            size: number;
+            /** Theme */
+            theme: string;
+        };
+        /** CreateExperimentRequest */
+        CreateExperimentRequest: {
+            /** Script Id */
+            script_id?: string | null;
+            /**
+             * Variant Count
+             * @default 3
+             */
+            variant_count: number;
+            /**
+             * Video Id
+             * Format: uuid
+             */
+            video_id: string;
+        };
+        /**
+         * DnaClusterOut
+         * @description One format group. Null outlier when none of its reels has one (reference reels).
+         */
+        DnaClusterOut: {
+            /** Dna Ids */
+            dna_ids: string[];
+            hook_type: components["schemas"]["HookType"];
+            /** Label */
+            label: string;
+            /** Median Length S */
+            median_length_s: number;
+            /** Median Outlier */
+            median_outlier: number | null;
+            /** Median Pacing Cuts Per 10S */
+            median_pacing_cuts_per_10s: number;
+            /** Size */
+            size: number;
         };
         /**
          * DnaRecordOut
@@ -384,6 +743,58 @@ export interface components {
             /** Transcript */
             transcript: string;
         };
+        /** EditRequest */
+        EditRequest: {
+            caption_style: components["schemas"]["CaptionStyle"];
+            /** Cut Silences */
+            cut_silences: boolean;
+            /** Hook Overlay */
+            hook_overlay: boolean;
+            /** Hook Text */
+            hook_text?: string | null;
+            /** Progress Bar */
+            progress_bar: boolean;
+            /**
+             * Roman Urdu Captions
+             * @default true
+             */
+            roman_urdu_captions: boolean;
+        };
+        /** ExperimentOut */
+        ExperimentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Share Instructions */
+            share_instructions: string | null;
+            status: components["schemas"]["ExperimentStatus"];
+            /**
+             * Strategy
+             * @constant
+             */
+            strategy: "thompson_sampling";
+            /** Variants */
+            variants: components["schemas"]["VariantOut"][];
+            /** Video Title */
+            video_title: string;
+            /** Winner Variant Id */
+            winner_variant_id: string | null;
+        };
+        /**
+         * ExperimentStatus
+         * @enum {string}
+         */
+        ExperimentStatus: "draft" | "publishing" | "live" | "done";
+        /** FormatPerformance */
+        FormatPerformance: {
+            hook_type: components["schemas"]["HookType"];
+            /** Median Outlier */
+            median_outlier: number;
+            /** Reels */
+            reels: number;
+        };
         /** GenerateScriptRequest */
         GenerateScriptRequest: {
             language: components["schemas"]["ScriptLanguage"];
@@ -407,11 +818,29 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** HookScoreRequest */
+        HookScoreRequest: {
+            hook_type?: components["schemas"]["HookType"] | null;
+            /** Hooks */
+            hooks: string[];
+        };
         /**
          * HookType
          * @enum {string}
          */
         HookType: "question" | "bold_claim" | "pattern_interrupt" | "story" | "list" | "other";
+        /** Idea */
+        Idea: {
+            /** Title */
+            title: string;
+            /** Why */
+            why: string;
+        };
+        /**
+         * InsightWindow
+         * @enum {string}
+         */
+        InsightWindow: "24h" | "72h";
         /** InstagramAccountOut */
         InstagramAccountOut: {
             /** Account Type */
@@ -448,6 +877,13 @@ export interface components {
              */
             job_id: string;
         };
+        /** Item */
+        Item: {
+            /** Detail */
+            detail: string;
+            /** Title */
+            title: string;
+        };
         /**
          * JobAccepted
          * @description The 202 body for every endpoint that starts long work (rules.md 3b.2).
@@ -483,6 +919,12 @@ export interface components {
          * @enum {string}
          */
         JobStatus: "queued" | "running" | "done" | "failed";
+        /** LabelCount */
+        LabelCount: {
+            /** Count */
+            count: number;
+            label: components["schemas"]["CommentLabel"];
+        };
         /**
          * Language
          * @enum {string}
@@ -509,10 +951,24 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** Page[CommentThemeOut] */
+        Page_CommentThemeOut_: {
+            /** Items */
+            items: components["schemas"]["CommentThemeOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** Page[DnaRecordOut] */
         Page_DnaRecordOut_: {
             /** Items */
             items: components["schemas"]["DnaRecordOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** Page[ExperimentOut] */
+        Page_ExperimentOut_: {
+            /** Items */
+            items: components["schemas"]["ExperimentOut"][];
             /** Next Cursor */
             next_cursor: string | null;
         };
@@ -659,6 +1115,26 @@ export interface components {
             /** Topic */
             topic: string;
         };
+        /** Totals */
+        Totals: {
+            /** Avg Watch Time S */
+            avg_watch_time_s: number;
+            /** Reach */
+            reach: number;
+            /** Saves */
+            saves: number;
+            /** Shares */
+            shares: number;
+            /** Views */
+            views: number;
+        };
+        /** TrendPoint */
+        TrendPoint: {
+            /** Date */
+            date: string;
+            /** Views */
+            views: number;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -672,11 +1148,105 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** VariantInsightOut */
+        VariantInsightOut: {
+            /** Reach */
+            reach: number | null;
+            /** Saves */
+            saves: number | null;
+            /** Shares */
+            shares: number | null;
+            /** Views */
+            views: number | null;
+            window: components["schemas"]["InsightWindow"];
+        };
+        /**
+         * VariantOut
+         * @description Field names match apps/web.
+         */
+        VariantOut: {
+            /** Caption */
+            caption: string;
+            /** Error */
+            error: string | null;
+            /** Hook Line */
+            hook_line: string;
+            /** Hook Style */
+            hook_style: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Insights */
+            insights: components["schemas"]["VariantInsightOut"][];
+            /** Is Trial */
+            is_trial: boolean;
+            /** Label */
+            label: string;
+            /** Opener */
+            opener: string;
+            /** Permalink */
+            permalink: string | null;
+            status: components["schemas"]["VariantStatus"];
+        };
+        /**
+         * VariantStatus
+         * @enum {string}
+         */
+        VariantStatus: "draft" | "publishing" | "live" | "failed";
         /**
          * VideoContentType
          * @enum {string}
          */
         VideoContentType: "video/mp4" | "video/quicktime";
+        /** VideoOut */
+        VideoOut: {
+            /** Duration S */
+            duration_s: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Output Url */
+            output_url: string | null;
+            /** Removed Silence S */
+            removed_silence_s: number | null;
+            /** Title */
+            title: string;
+        };
+        /**
+         * VideoUpload
+         * @description PUT the file to `upload_url` with these headers, then call POST /videos/{id}/edit.
+         */
+        VideoUpload: {
+            /** Upload Headers */
+            upload_headers: {
+                [key: string]: string;
+            };
+            /** Upload Url */
+            upload_url: string;
+            video: components["schemas"]["VideoOut"];
+        };
+        /**
+         * WeeklyReportContent
+         * @description Field names match apps/web.
+         */
+        WeeklyReportContent: {
+            /** Headline */
+            headline: string;
+            /** Ideas */
+            ideas: components["schemas"]["Idea"][];
+            /** Losses */
+            losses: components["schemas"]["Item"][];
+            /** Themes */
+            themes: string[];
+            /** Week Start */
+            week_start: string;
+            /** Wins */
+            wins: components["schemas"]["Item"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -686,6 +1256,86 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    read_overview_api_v1_analytics_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsOverview"];
+                };
+            };
+        };
+    };
+    read_summary_api_v1_comments_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentSummaryOut"];
+                };
+            };
+        };
+    };
+    sync_comments_api_v1_comments_sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+        };
+    };
+    read_themes_api_v1_comments_themes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CommentThemeOut_"];
+                };
+            };
+        };
+    };
     list_dna_api_v1_dna_get: {
         parameters: {
             query?: {
@@ -752,6 +1402,26 @@ export interface operations {
             };
         };
     };
+    read_clusters_api_v1_dna_clusters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DnaClusterOut"][];
+                };
+            };
+        };
+    };
     read_dna_api_v1_dna__dna_id__get: {
         parameters: {
             query?: never;
@@ -814,6 +1484,164 @@ export interface operations {
             };
         };
     };
+    list_experiments_api_v1_experiments_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ExperimentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_experiment_api_v1_experiments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExperimentRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_experiment_api_v1_experiments__experiment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                experiment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_experiment_api_v1_experiments__experiment_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                experiment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    share_winner_api_v1_experiments__experiment_id__share_winner_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                experiment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_health_api_v1_health_get: {
         parameters: {
             query?: never;
@@ -830,6 +1658,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    score_hooks_api_v1_hooks_score_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HookScoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -1122,6 +1983,46 @@ export interface operations {
             };
         };
     };
+    read_weekly_report_api_v1_reports_weekly_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyReportContent"];
+                };
+            };
+        };
+    };
+    build_weekly_report_api_v1_reports_weekly_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+        };
+    };
     generate_script_api_v1_scripts_generate_post: {
         parameters: {
             query?: never;
@@ -1173,6 +2074,105 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScriptOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_video_upload_api_v1_videos_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferenceUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoUpload"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_video_api_v1_videos__video_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                video_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_video_api_v1_videos__video_id__edit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                video_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
                 };
             };
             /** @description Validation Error */

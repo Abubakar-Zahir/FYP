@@ -72,6 +72,9 @@ class FakeStorage:
     async def download_to(self, key: str, path: Path) -> None:
         path.write_bytes(self.objects[key])
 
+    async def upload_file(self, path: Path, key: str, content_type: str) -> None:
+        self.objects[key] = path.read_bytes()
+
     async def delete(self, keys: list[str]) -> None:
         for key in keys:
             self.objects.pop(key, None)

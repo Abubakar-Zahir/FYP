@@ -23,12 +23,16 @@ class InstagramCallback(BaseModel):
 class InstagramAccountOut(BaseModel):
     username: str
     account_type: str
-    # Unknown until the first Trial Reel publish answers (P0-09 and Phase 3).
+    # Null until the first publish shows whether Instagram accepts Trial Reels from this account.
     trial_reels_eligible: bool | None
 
     @classmethod
     def from_account(cls, account: InstagramAccount) -> "InstagramAccountOut":
-        return cls(username=account.username, account_type=account.account_type, trial_reels_eligible=None)
+        return cls(
+            username=account.username,
+            account_type=account.account_type,
+            trial_reels_eligible=account.trial_reels_eligible,
+        )
 
 
 class InstagramConnected(JobAccepted):

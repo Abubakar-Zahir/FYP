@@ -36,3 +36,15 @@ class AnalyseResult(BaseModel):
     """The `result` of a dna.analyse job."""
 
     dna_id: UUID
+
+
+class DnaClusterOut(BaseModel):
+    """One format group. Null outlier when none of its reels has one (reference reels)."""
+
+    label: str
+    size: int
+    hook_type: HookType
+    median_pacing_cuts_per_10s: float
+    median_length_s: float
+    median_outlier: float | None
+    dna_ids: list[UUID]

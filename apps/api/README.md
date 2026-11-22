@@ -147,3 +147,48 @@ Keyframes are not kept yet, because nothing reads them until OCR or a vision mod
 The worker builds the prompt from the template's structure, the creator's niche, tone and goals, and their latest captions as voice examples (`ml/scripts/generate.py`). It asks for 5 hooks, 3 angles and a full script, retries once on a bad answer, and stores the prompt and model version with the output.
 
 `GET /api/v1/scripts/{id}` returns the script, or `409 script_not_ready` while the job runs. Hooks carry `score: null` until the hook scorer ships in Phase 2.
+
+## Comment intelligence
+
+`POST /api/v1/comments/sync` starts `comments.sync` on the `ai` queue:
+
+1. Labels every comment without a label, using the model at `COMMENT_MODEL_PATH`. That is a `.joblib` file from `ml.comments.train`, or the XLM-R ONNX folder from the notebook, which needs the `nlp` group on the worker. Each label stores the model that made it.
+2. Groups the last 90 days of labelled, non-spam comments into up to 8 themes (`ml/comments/themes.py`).
+3. Asks the LLM for a short name and a next-video idea per theme. Without an LLM, or if its answer is unreadable, it uses a plain fallback built from the comments themselves.
+
+`GET /api/v1/comments/summary` counts labelled comments by label over 30 days. `GET /api/v1/comments/themes` returns the themes, largest first. Disconnecting Instagram deletes the themes along with the comments.
+
+## Auto-edit
+
+1. `POST /api/v1/videos/upload-url {filename, content_type, size_bytes}` returns a presigned PUT, the same way reference reels upload.
+2. `POST /api/v1/videos/{id}/edit {caption_style, cut_silences, progress_bar, hook_overlay, hook_text?, roman_urdu_captions?}` starts `videos.edit` on the `video` queue.
+3. The worker downloads the video and gets word timings from Whisper. It cuts pauses longer than 0.6 s, writes word-level captions (`bold_pop`, `karaoke`, `minimal` or `boxed`, in Roman Urdu by default) and burns them in with one FFmpeg run. It can add a progress bar and the hook line, then uploads `edited.mp4` to R2.
+4. The job result, and `GET /api/v1/videos/{id}`, give `output_url` (valid for an hour), `duration_s` and `removed_silence_s`.
+
+The `ml/edit/` code holds the cut, caption, transliteration and render logic. The video worker image installs `ffmpeg`. Error codes: `video_too_long`, `video_unreadable`, `upload_missing`, `render_failed`.
+
+## Variants, publishing and the variant learner
+
+1. `POST /api/v1/experiments {video_id, script_id?, variant_count}`: the LLM writes candidates, and the Thompson sampling learner picks which 3 to 5 to test.
+2. `POST /api/v1/experiments/{id}/publish`: `experiments.publish` (video queue) checks the publishing quota. Then, for each variant, it burns the hook line onto the edited video, uploads it, and publishes it as a Trial Reel (`TRIAL_GRADUATION_STRATEGY`, default `MANUAL`), with a cover frame chosen by the opener type.
+   - If Instagram refuses the first Trial Reel, the account is marked not eligible. Only the learner's top pick goes out, as a normal reel (FR-6.8), because posting every variant publicly would look like duplicate content.
+   - A retry never republishes a variant that is already live.
+3. Every 30 minutes, the `beat` task `experiments.collect_insights` stores insights at 24 h (preliminary, data can lag) and 72 h. Once every live variant has 72 h numbers, it picks the winner on views, and the learner records whether each variant beat the creator's median views.
+4. `POST /api/v1/experiments/{id}/share-winner` records the request and returns `share_instructions`. The API can't share a Trial Reel with followers, so the creator does it in the app.
+
+## Analytics and weekly report
+
+`GET /api/v1/analytics/overview` sums the last 30 days of imported reels against the 30 before. It returns daily views, plus the best formats by hook type (median outlier score).
+
+The weekly report (`ml/reports/weekly.py`) is built from the creator's own data with plain rules, no LLM:
+- wins and losses against the creator's usual views;
+- comment themes and their ideas;
+- the variant learner's findings once a feature has 3 or more tests and wins more than half.
+
+The `beat` service builds it every Monday at 06:00 UTC. `POST /api/v1/reports/weekly` rebuilds it now, and `GET /api/v1/reports/weekly` returns the latest one.
+
+## Rate limits, request ids, error tracking
+
+- **Rate limits.** Writes (POST, PUT, PATCH, DELETE) are limited per sign-in token, or per IP without one: 60 a minute, and 10 a minute for `/instagram/*`. Going over returns `429 rate_limited` with `Retry-After`. Counts live in Redis when `REDIS_URL` is set, so all API processes share them. If Redis fails, requests go through and the failure is logged.
+- **Request ids.** Every response carries `X-Request-ID`, and each request is logged with its method, path, status and time, never its body.
+- **Error tracking.** Sentry starts when `SENTRY_DSN` is set, in both the API and the workers, with personal data and request bodies off.

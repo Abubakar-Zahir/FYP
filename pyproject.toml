@@ -11,9 +11,12 @@ dependencies = [
     "cryptography>=44",
     "fastapi[standard]>=0.115",
     "httpx>=0.27",
+    "lightgbm>=4.5",
     "pydantic>=2.9",
     "pydantic-settings>=2.5",
     "pyjwt[crypto]>=2.10",
+    "scikit-learn>=1.5",
+    "sentry-sdk[celery,fastapi]>=2.20",
     "sqlalchemy[asyncio]>=2.0",
 ]
 
@@ -24,6 +27,10 @@ dev = [
     "mypy>=1.11",
     "pytest>=8.3",
     "ruff>=0.6",
+]
+nlp = [
+    "onnxruntime>=1.20",
+    "tokenizers>=0.20",
 ]
 video = [
     "av>=17,<18",
@@ -46,8 +53,13 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP", "S", "T20"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**" = ["S101"]
+"**/tests/**" = ["S101", "S311"]
 "spikes/**" = ["T20", "S603", "S607"]
+# Command-line entry points that report results to the person running them.
+"ml/**/train.py" = ["T20"]
+"ml/**/report.py" = ["T20"]
+"apps/api/scripts/**" = ["T20"]
+"notebooks/**" = ["T20", "E402"]
 
 [tool.mypy]
 strict = true
@@ -57,12 +69,12 @@ explicit_package_bases = true
 
 # These libraries ship no type information.
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*", "boto3", "boto3.*", "botocore", "botocore.*"]
+module = ["celery", "celery.*", "cv2", "cv2.*", "faster_whisper", "faster_whisper.*", "scenedetect", "scenedetect.*", "boto3", "boto3.*", "botocore", "botocore.*", "sklearn", "sklearn.*", "joblib", "joblib.*", "lightgbm", "lightgbm.*", "onnxruntime", "onnxruntime.*", "tokenizers", "tokenizers.*", "scipy", "scipy.*"]
 ignore_missing_imports = true
 
 # Celery's task decorator is untyped. Only the thin task modules use it.
 [[tool.mypy.overrides]]
-module = ["app.workers.instagram_tasks", "app.workers.dna_tasks", "app.workers.script_tasks"]
+module = ["app.workers.instagram_tasks", "app.workers.dna_tasks", "app.workers.script_tasks", "app.workers.comment_tasks", "app.workers.video_tasks", "app.workers.experiment_tasks", "app.workers.report_tasks"]
 disallow_untyped_decorators = false
 
 [tool.pytest.ini_options]
