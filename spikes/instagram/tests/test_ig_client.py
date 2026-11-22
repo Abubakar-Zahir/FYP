@@ -1,6 +1,5 @@
 import json
 from collections.abc import Callable
-from urllib.parse import parse_qs, urlparse
 
 import httpx
 import pytest
@@ -10,12 +9,10 @@ from spikes.instagram.ig_client import (
     GraduationStrategy,
     InstagramClient,
     InstagramError,
-    build_authorize_url,
-    clean_authorization_code,
-    exchange_code,
 )
 
 TOKEN = "secret-token"  # noqa: S105
+IG_ID = "17841400000000000"
 Handler = Callable[[httpx.Request], httpx.Response]
 
 
@@ -25,32 +22,47 @@ def make_client(handler: Handler, sleeps: list[float] | None = None) -> Instagra
     return InstagramClient(http, TOKEN, recorded.append)
 
 
-def test_authorize_url_requests_every_scope() -> None:
-    query = parse_qs(urlparse(build_authorize_url("app", "https://x.dev/cb", "st")).query)
+def recording(body: dict[str, object], requests: list[httpx.Request]) -> Handler:
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json=body)
 
-    assert query["response_type"] == ["code"]
-    assert query["state"] == ["st"]
-    assert "instagram_business_content_publish" in query["scope"][0]
-    assert "instagram_business_manage_insights" in query["scope"][0]
-
-
-def test_clean_authorization_code_strips_fragment() -> None:
-    assert clean_authorization_code("abc#_") == "abc"
+    return handler
 
 
-@pytest.mark.parametrize(
-    "body",
-    [
-        {"access_token": "t", "user_id": 7},
-        {"data": [{"access_token": "t", "user_id": 7, "permissions": "x"}]},
-    ],
-)
-def test_exchange_code_accepts_both_shapes(body: dict[str, object]) -> None:
-    http = httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=body)))
+def test_calls_go_to_the_facebook_graph_host() -> None:
+    requests: list[httpx.Request] = []
 
-    token = exchange_code(http, "app", "secret", "https://x.dev/cb", "abc#_")
+    make_client(recording({"data": []}, requests)).assigned_accounts()
 
-    assert token.user_id == "7"
+    assert requests[0].url.host == "graph.facebook.com"
+    assert requests[0].url.path == "/v27.0/me/assigned_instagram_accounts"
+
+
+def test_assigned_accounts_lists_id_and_username() -> None:
+    body = {"data": [{"id": IG_ID, "username": "test.account"}]}
+
+    accounts = make_client(lambda _: httpx.Response(200, json=body)).assigned_accounts()
+
+    assert [(account.id, account.username) for account in accounts] == [(IG_ID, "test.account")]
+
+
+def test_account_reads_the_instagram_id_not_me() -> None:
+    requests: list[httpx.Request] = []
+    body = {"id": IG_ID, "username": "test.account", "followers_count": 1200, "media_count": 40}
+
+    account = make_client(recording(body, requests)).account(IG_ID)
+
+    assert requests[0].url.path == f"/v27.0/{IG_ID}"
+    assert account.followers_count == 1200
+
+
+def test_recent_reels_reads_the_instagram_id_not_me() -> None:
+    requests: list[httpx.Request] = []
+
+    make_client(recording({"data": []}, requests)).recent_reels(IG_ID, 10)
+
+    assert requests[0].url.path == f"/v27.0/{IG_ID}/media"
 
 
 def test_trial_container_sends_trial_params() -> None:
@@ -114,7 +126,7 @@ def test_errors_never_contain_the_token() -> None:
     )
 
     with pytest.raises(InstagramError) as caught:
-        client.account()
+        client.account(IG_ID)
 
     assert "bad request" in str(caught.value)
     assert TOKEN not in str(caught.value)
@@ -128,14 +140,14 @@ def test_recent_reels_keeps_only_reels_and_follows_pages() -> None:
                     {"id": "1", "media_type": "VIDEO", "media_product_type": "REELS"},
                     {"id": "2", "media_type": "IMAGE", "media_product_type": "FEED"},
                 ],
-                "paging": {"cursors": {"after": "abc"}, "next": "https://graph.instagram.com/next"},
+                "paging": {"cursors": {"after": "abc"}, "next": "https://graph.facebook.com/next"},
             },
             {"data": [{"id": "3", "media_type": "VIDEO", "media_product_type": "REELS"}]},
         ]
     )
     client = make_client(lambda _: httpx.Response(200, json=next(pages)))
 
-    assert [reel.id for reel in client.recent_reels(10)] == ["1", "3"]
+    assert [reel.id for reel in client.recent_reels(IG_ID, 10)] == ["1", "3"]
 
 
 def test_insights_treat_missing_values_as_unavailable() -> None:

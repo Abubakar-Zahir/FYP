@@ -1,29 +1,22 @@
-"""Minimal client for the Instagram API with Instagram Login.
+"""Minimal client for the Instagram API with Unified Login.
 
-Endpoints, scopes and fields follow Meta's docs, read on 2026-11-03. The README
-lists the ones the docs did not fully confirm for this login type.
+Our Meta app uses Unified Login, so calls go to graph.facebook.com with a business
+integration system user token. With that token `/me` is the system user, not the
+Instagram account, so every call names the Instagram account id. Endpoints and fields
+follow Meta's docs, read on 2026-11-16. The README lists what the docs did not confirm.
 """
 
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Any
-from urllib.parse import urlencode
 
 import httpx
 from pydantic import BaseModel
 
-AUTHORIZE_URL = "https://www.instagram.com/oauth/authorize"
-SHORT_LIVED_TOKEN_URL = "https://api.instagram.com/oauth/access_token"  # noqa: S105
-GRAPH_HOST = "https://graph.instagram.com"
-API_VERSION = "v26.0"
+GRAPH_HOST = "https://graph.facebook.com"
+API_VERSION = "v27.0"
 GRAPH_URL = f"{GRAPH_HOST}/{API_VERSION}"
 
-SCOPES = (
-    "instagram_business_basic",
-    "instagram_business_content_publish",
-    "instagram_business_manage_insights",
-    "instagram_business_manage_comments",
-)
 REEL_METRICS = ("views", "reach", "saved", "shares", "total_interactions", "ig_reels_avg_watch_time")
 REEL_PRODUCT_TYPE = "REELS"
 MEDIA_PAGE_SIZE = 50
@@ -44,20 +37,15 @@ class InstagramError(Exception):
     """Carries Meta's message only. The request URL holds the token, so it must never appear here."""
 
 
-class ShortLivedToken(BaseModel):
-    access_token: str
-    user_id: str
-
-
-class LongLivedToken(BaseModel):
-    access_token: str
-    expires_in: int
+class AssignedAccount(BaseModel):
+    id: str
+    username: str
 
 
 class Account(BaseModel):
-    user_id: str
+    id: str
     username: str
-    account_type: str
+    followers_count: int | None = None
     media_count: int | None = None
 
 
@@ -81,22 +69,6 @@ class PublishingLimit(BaseModel):
     quota_total: int | None = None
 
 
-def build_authorize_url(app_id: str, redirect_uri: str, state: str) -> str:
-    query = {
-        "client_id": app_id,
-        "redirect_uri": redirect_uri,
-        "response_type": "code",
-        "scope": ",".join(SCOPES),
-        "state": state,
-    }
-    return f"{AUTHORIZE_URL}?{urlencode(query)}"
-
-
-def clean_authorization_code(code: str) -> str:
-    """Instagram appends `#_` to the redirect, and it is not part of the code."""
-    return code.removesuffix("#_")
-
-
 def _body(response: httpx.Response) -> dict[str, Any]:
     try:
         body = response.json()
@@ -108,39 +80,6 @@ def _body(response: httpx.Response) -> dict[str, Any]:
         raise InstagramError(f"Status {response.status_code}: {message}")
     result: dict[str, Any] = body
     return result
-
-
-def exchange_code(
-    http: httpx.Client, app_id: str, app_secret: str, redirect_uri: str, code: str
-) -> ShortLivedToken:
-    response = http.post(
-        SHORT_LIVED_TOKEN_URL,
-        data={
-            "client_id": app_id,
-            "client_secret": app_secret,
-            "grant_type": "authorization_code",
-            "redirect_uri": redirect_uri,
-            "code": clean_authorization_code(code),
-        },
-    )
-    body = _body(response)
-    # Meta has returned this both flat and wrapped in `data`.
-    entry = body["data"][0] if "data" in body else body
-    return ShortLivedToken(access_token=entry["access_token"], user_id=str(entry["user_id"]))
-
-
-def exchange_for_long_lived(http: httpx.Client, app_secret: str, short_lived_token: str) -> LongLivedToken:
-    params = {
-        "grant_type": "ig_exchange_token",
-        "client_secret": app_secret,
-        "access_token": short_lived_token,
-    }
-    return LongLivedToken.model_validate(_body(http.get(f"{GRAPH_HOST}/access_token", params=params)))
-
-
-def refresh_long_lived(http: httpx.Client, token: str) -> LongLivedToken:
-    params = {"grant_type": "ig_refresh_token", "access_token": token}
-    return LongLivedToken.model_validate(_body(http.get(f"{GRAPH_HOST}/refresh_access_token", params=params)))
 
 
 class InstagramClient:
@@ -157,15 +96,21 @@ class InstagramClient:
             self._http.post(f"{GRAPH_URL}/{path}", params={"access_token": self._token}, json=payload)
         )
 
-    def account(self) -> Account:
-        return Account.model_validate(self._get("me", fields="user_id,username,account_type,media_count"))
+    def assigned_accounts(self) -> list[AssignedAccount]:
+        """The Instagram accounts this token may use, which confirms the id to put in .env.instagram."""
+        body = self._get("me/assigned_instagram_accounts", fields="id,username")
+        return [AssignedAccount.model_validate(item) for item in body.get("data", [])]
 
-    def recent_reels(self, limit: int) -> list[Media]:
+    def account(self, ig_id: str) -> Account:
+        return Account.model_validate(self._get(ig_id, fields="id,username,followers_count,media_count"))
+
+    def recent_reels(self, ig_id: str, limit: int) -> list[Media]:
         fields = "id,caption,media_type,media_product_type,permalink,timestamp"
         reels: list[Media] = []
         params: dict[str, str | int] = {"fields": fields, "limit": MEDIA_PAGE_SIZE}
         while len(reels) < limit:
-            body = self._get("me/media", **params)
+            # Meta documents time-based paging for this edge. Cursors are followed if they come back.
+            body = self._get(f"{ig_id}/media", **params)
             media = [Media.model_validate(item) for item in body.get("data", [])]
             # Published reels report media_type VIDEO. Only media_product_type identifies them.
             reels += [item for item in media if item.media_product_type == REEL_PRODUCT_TYPE]
